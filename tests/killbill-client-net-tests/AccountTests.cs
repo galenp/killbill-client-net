@@ -18,18 +18,15 @@ namespace KillBill.Client.Net.Tests
             account.AccountId.Should().Be(AccountId);
         }
 
-
-        [TestCase(0, 1)]
-        public void Get_Accounts(int offset, int limit)
+      
+        public void Get_Accounts()
         {
             //When
-            var accounts = Client.GetAccounts(offset, limit);
+            var accounts = Client.GetAccounts();
 
             //Then
             accounts.Should().NotBeNull();
             accounts.Should().NotBeEmpty();
-            accounts.Count.Should().BeLessOrEqualTo(limit);
-            accounts.PaginationNextPageUri.Should().NotBeEmpty();
         }
 
         [Test]
@@ -67,9 +64,6 @@ namespace KillBill.Client.Net.Tests
             timeline.Account.AccountId.Should().Be(AccountId);
 
         }
-
-
-
         
     }
 }
