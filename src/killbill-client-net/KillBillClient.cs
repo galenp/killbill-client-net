@@ -119,8 +119,24 @@ namespace KillBill.Client.Net
             return client.Get<AccountTimeline>(uri, queryparams);
         }
 
+        //BUNDLE
+        //-------------------------------------------------------------------------------------------------------------------------------------        
+        public Bundle GetBundle(Guid bundleId)
+        {
+            var uri = KbConfig.BUNDLES_PATH + "/" + bundleId;
+            return client.Get<Bundle>(uri, DEFAULT_EMPTY_QUERY);
+        }
+
+        public Bundle GetBundle(string externalKey)
+        {
+            var uri = KbConfig.BUNDLES_PATH;
+            var queryparams = new MultiMap<string>();
+            queryparams.Add(KbConfig.QUERY_EXTERNAL_KEY, externalKey);
+            return client.Get<Bundle>(uri, queryparams);
+        }
+
         //BUNDLES
-        //-------------------------------------------------------------------------------------------------------------------------------------
+        //-------------------------------------------------------------------------------------------------------------------------------------        
         public Bundles GetAccountBundles(Guid accountId)
         {
             var uri = KbConfig.ACCOUNTS_PATH + "/" + accountId + "/" + KbConfig.BUNDLES;
