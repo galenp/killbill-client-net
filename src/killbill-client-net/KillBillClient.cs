@@ -135,6 +135,23 @@ namespace KillBill.Client.Net
             return client.Get<Bundle>(uri, queryparams);
         }
 
+        public Bundle TransferBundle(Bundle bundle, string createdBy, string reason, string comment)
+        {
+            if (bundle == null)
+                throw new ArgumentNullException("bundle");
+
+            if (bundle.AccountId.Equals(Guid.Empty))
+                throw new ArgumentException("AccountEmail#accountId cannot be empty");
+
+            if (bundle.BundleId.Equals(Guid.Empty))
+                throw new ArgumentException("AccountEmail#bundleId cannot be empty");
+
+            var uri = KbConfig.BUNDLES_PATH + "/" + bundle.BundleId;
+
+            var options = ParamsWithAudit(createdBy, reason, comment);
+            return client.PutAndFollow<Bundle>(uri, bundle, options, DEFAULT_EMPTY_QUERY);
+        }
+
         //BUNDLES
         //-------------------------------------------------------------------------------------------------------------------------------------        
         public Bundles GetAccountBundles(Guid accountId)
@@ -164,6 +181,7 @@ namespace KillBill.Client.Net
             queryparams.Add(KbConfig.QUERY_AUDIT, auditLevel.ToString());
             return client.Get<Bundles>(uri, queryparams);
         }
+
         
         //CREDITS
         //-------------------------------------------------------------------------------------------------------------------------------------
