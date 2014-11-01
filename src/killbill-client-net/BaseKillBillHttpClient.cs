@@ -80,10 +80,37 @@ namespace KillBill.Client.Net
 
         public T PutAndFollow<T>(string uri, object body, MultiMap<string> options, MultiMap<string> optionsForFollow) where T : new()
         {
-            return SendRequestAndMaybeFollowLocation<T>(Method.POST, uri, body, options, optionsForFollow, true);
+            return SendRequestAndMaybeFollowLocation<T>(Method.PUT, uri, body, options, optionsForFollow, true);
         }
 
-        // COIMMON
+
+        // PUT
+        //-------------------------------------------------------------------------------
+        // - untyped without follow
+        public IRestResponse Delete(string uri, object body, MultiMap<string> options)
+        {
+            return SendRequest(Method.DELETE, uri, body, options);
+        }
+
+        // - typed without follow
+        public T Delete<T>(string uri, object body, MultiMap<string> options) where T : new()
+        {
+            return Delete<T>(uri, body, options, DEFAULT_EMPTY_QUERY, false);
+        }
+
+        // - typed with follow
+        public T Delete<T>(string uri, object body, MultiMap<string> options, MultiMap<string> optionsForFollow, bool followLocation) where T : new()
+        {
+            return SendRequestAndMaybeFollowLocation<T>(Method.DELETE, uri, body, options, optionsForFollow, followLocation);
+        }
+
+        public T DeleteAndFollow<T>(string uri, object body, MultiMap<string> options, MultiMap<string> optionsForFollow) where T : new()
+        {
+            return SendRequestAndMaybeFollowLocation<T>(Method.DELETE, uri, body, options, optionsForFollow, true);
+        }
+
+
+        // COMMON
         //-------------------------------------------------------------------------------
         private T SendRequestAndMaybeFollowLocation<T>(Method method, string uri, MultiMap<string> options) where T : new()
         {

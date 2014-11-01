@@ -72,8 +72,43 @@ namespace KillBill.Client.Net
             return client.Get<Accounts>(uri, queryparams);
         }
 
+        //ACCOUNT EMAIL
+        //-------------------------------------------------------------------------------------------------------------------------------------
+        public void AddEmailToAccount(AccountEmail email, string createdBy, string reason, string comment)
+        {
+            if (email == null)
+                throw new ArgumentNullException("email");
 
-        //ACCOUNTTIMELINE
+            if (email.AccountId.Equals(Guid.Empty))
+                throw new ArgumentException("AccountEmail#accountId cannot be empty");
+            var uri = KbConfig.ACCOUNTS_PATH + "/" + email.AccountId + "/" + KbConfig.EMAILS;
+            var options = ParamsWithAudit(createdBy, reason, comment);
+
+            client.Post(uri, email, options);
+        }
+
+        public void RemoveEmailFromAccount(AccountEmail email, string createdBy, string reason, string comment)
+        {
+            if (email == null)
+                throw new ArgumentNullException("email");
+
+            if (email.AccountId.Equals(Guid.Empty))
+                throw new ArgumentException("AccountEmail#accountId cannot be empty");
+            
+            var uri = KbConfig.ACCOUNTS_PATH + "/" + email.AccountId + "/" + KbConfig.EMAILS;
+            var options = ParamsWithAudit(createdBy, reason, comment);
+            client.Delete(uri, options, options);
+        }
+
+        //ACCOUNT EMAILS
+        //-------------------------------------------------------------------------------------------------------------------------------------
+        public AccountEmails GetEmailsForAccount(Guid accountId)
+        {
+            var uri = KbConfig.ACCOUNTS_PATH + "/" + accountId + "/" + KbConfig.EMAILS;
+            return client.Get<AccountEmails>(uri, DEFAULT_EMPTY_QUERY);
+        }
+
+        //ACCOUNT TIMELINE
         //-------------------------------------------------------------------------------------------------------------------------------------
         public AccountTimeline GetAccountTimeline(Guid accountId, AuditLevel auditLevel = DEFAULT_AUDIT_LEVEL)
         {

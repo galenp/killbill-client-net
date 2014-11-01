@@ -104,6 +104,8 @@
     <Compile Include="KillBillClientException.cs" />
     <Compile Include="Model\Account.cs" />
     <Compile Include="AuditLevel.cs" />
+    <Compile Include="Model\AccountEmail.cs" />
+    <Compile Include="Model\AccountEmails.cs" />
     <Compile Include="Model\Accounts.cs" />
     <Compile Include="Model\AccountTimeline.cs" />
     <Compile Include="Model\AuditLog.cs" />

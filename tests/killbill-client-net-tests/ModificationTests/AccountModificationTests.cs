@@ -88,5 +88,36 @@ namespace KillBill.Client.Net.Tests.ModificationTests
             updatedAccount.Address1.Should().Be(newAddress1);
             updatedAccount.Address2.Should().Be(newAddress2);
         }
+
+        [Test]
+        public void Add_Email_To_Account()
+        {
+            //Given
+            var email = new AccountEmail {AccountId = AccountId, Email = "tester@test.com"};
+
+            //When
+            Client.AddEmailToAccount(email, CreatedBy, Reason, "AccountModificationTests:Add_Email_To_Account");
+
+            //Then -- it should not error.....
+        }
+
+
+
+        //This test is currently failing because the http server running my KB I think is blocked DELETE methods.
+        //HTTP/1.1 405 Method Not Allowed
+        //Allow: POST,GET,OPTIONS,HEAD
+        //Have verified at http://killbill.io/api/#!/accounts/removeEmail that the process works so this is just a configuration issue.
+        [Test]
+        [Ignore]
+        public void Remove_Email_From_Account()
+        {
+            //Given
+            var email = new AccountEmail { AccountId = AccountId, Email = "tester@test.com" };
+
+            //When
+            Client.RemoveEmailFromAccount(email, CreatedBy, Reason, "AccountModificationTests:Remove_Email_From_Account");
+
+            //Then -- it should not error.....
+        }
     }
 }

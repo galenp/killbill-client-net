@@ -63,6 +63,17 @@ namespace KillBill.Client.Net.Tests.SafeTests
             timeline.Account.AccountId.Should().Be(AccountId);
 
         }
+
+        [Test]
+        public void Get_Emails_For_Account()
+        {
+            //When
+            var emails = Client.GetEmailsForAccount(AccountId);
+
+            //Then
+            emails.Should().NotBeNull();
+            emails.Should().NotBeEmpty();
+        }
         
     }
 }
