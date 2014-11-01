@@ -96,17 +96,7 @@ namespace KillBill.Client.Net
 
         //INVOICE
         //-------------------------------------------------------------------------------------------------------------------------------------
-        public Invoice GetInvoice(string invoiceIdOrNumber, bool withItems, AuditLevel auditLevel)
-        {
-            var uri = KbConfig.INVOICES_PATH + "/" + invoiceIdOrNumber;
-
-            var options = new MultiMap<string>();
-            options.Add(KbConfig.QUERY_INVOICE_WITH_ITEMS, withItems.ToString());
-            options.Add(KbConfig.QUERY_AUDIT, auditLevel.ToString());
-
-
-            return client.Get<Invoice>(uri, options);
-        }
+        
 
         /// <summary>
         /// Triggers an invoice RUN!
@@ -121,6 +111,24 @@ namespace KillBill.Client.Net
             var options = ParamsWithAudit(param, createdBy, reason, comment);
 
             return client.PostAndFollow<Invoice>(KbConfig.INVOICES_PATH, invoice, options, DEFAULT_EMPTY_QUERY);
+        }
+
+        public Invoice GetInvoice(int invoiceNumber, bool withItems = false, AuditLevel auditLevel = AuditLevel.NONE)
+        {
+            return GetInvoiceByIdOrNumber(invoiceNumber.ToString(), withItems, auditLevel);
+        }
+        public Invoice GetInvoice(string invoiceIdOrNumber, bool withItems=false, AuditLevel auditLevel = AuditLevel.NONE)
+        {
+            return GetInvoiceByIdOrNumber(invoiceIdOrNumber, withItems, auditLevel);
+        }
+        public Invoice GetInvoiceByIdOrNumber(string invoiceIdOrNumber, bool withItems = false, AuditLevel auditLevel = AuditLevel.NONE)
+        {
+            var uri = KbConfig.INVOICES_PATH + "/" + invoiceIdOrNumber;
+            var queryparams = new MultiMap<string>();
+            queryparams.Add(KbConfig.QUERY_INVOICE_WITH_ITEMS, withItems.ToString());
+            queryparams.Add(KbConfig.QUERY_AUDIT, auditLevel.ToString());
+
+            return client.Get<Invoice>(uri, queryparams);
         }
 
         //INVOICES
