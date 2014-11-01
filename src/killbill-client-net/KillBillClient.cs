@@ -59,6 +59,20 @@ namespace KillBill.Client.Net
             return client.Put<Account>(uri, account, options);
         }
 
+        //ACCOUNTS
+        //-------------------------------------------------------------------------------------------------------------------------------------
+        public Accounts GetAccounts(long offset = 0L, long limit = 100L, AuditLevel auditLevel = DEFAULT_AUDIT_LEVEL)
+        {
+            var uri = KbConfig.ACCOUNTS_PATH + "/" + KbConfig.PAGINATION;
+
+            var queryparams = new MultiMap<string>();
+            queryparams.Add(KbConfig.QUERY_SEARCH_OFFSET, offset.ToString());
+            queryparams.Add(KbConfig.QUERY_SEARCH_LIMIT, limit.ToString());
+            queryparams.Add(KbConfig.QUERY_SEARCH_LIMIT, auditLevel.ToString());
+            return client.Get<Accounts>(uri, queryparams);
+        }
+
+
         //ACCOUNTTIMELINE
         //-------------------------------------------------------------------------------------------------------------------------------------
         public AccountTimeline GetAccountTimeline(Guid accountId, AuditLevel auditLevel = DEFAULT_AUDIT_LEVEL)
@@ -148,7 +162,7 @@ namespace KillBill.Client.Net
         public Invoices GetInvoicesForAccount(Guid accountId, bool withItems = false, bool unpaidOnly = false, AuditLevel auditLevel = DEFAULT_AUDIT_LEVEL)
         {
 
-            var uri = KbConfig.ACCOUNTS_PATH + "/" + accountId + KbConfig.INVOICES;
+            var uri = KbConfig.ACCOUNTS_PATH + "/" + accountId + "/" + KbConfig.INVOICES;
 
             var options = new MultiMap<string>();
             options.Add(KbConfig.QUERY_INVOICE_WITH_ITEMS, withItems.ToString());

@@ -5,6 +5,7 @@ using System.Net;
 using KillBill.Client.Net.Infrastructure;
 using KillBill.Client.Net.JSON;
 using KillBill.Client.Net.Model;
+using Newtonsoft.Json;
 using RestSharp;
 
 namespace KillBill.Client.Net
@@ -139,12 +140,45 @@ namespace KillBill.Client.Net
                 return GetWithUrl<T>(locationHeader.Value.ToString(), optionsForFollow);
             }
 
-            var response = ExecuteRequest<T>(request);
-
-            return response.Data;
+            var response = ExecuteRequest(request);
+            var data = DeserializeResponse<T>(response);
+            return data;
         }
 
-        
+        private T DeserializeResponse<T>(IRestResponse response)
+        {
+            var obj = JsonConvert.DeserializeObject<T>(response.Content, JsonNetSerializationSettings.GetDefault());
+
+            if (obj.GetType().GetInterfaces().Contains(typeof(IKillBillObjects)))
+            {
+                var objects = obj as IKillBillObjects;
+
+                //Get Pagination meta data from the response headers
+                if (objects != null)
+                {
+                    var paginationCurrentOffset = response.Headers.GetValue(KbConfig.HDR_PAGINATION_CURRENT_OFFSET);
+                    if (paginationCurrentOffset != null)
+                        objects.PaginationCurrentOffset = paginationCurrentOffset.ToInt();
+
+                    var paginationNextOffset = response.Headers.GetValue(KbConfig.HDR_PAGINATION_NEXT_OFFSET);
+                    if (paginationNextOffset != null)
+                        objects.PaginationNextOffset = paginationNextOffset.ToInt();
+
+                    var paginationMaxNbRecords = response.Headers.GetValue(KbConfig.HDR_PAGINATION_MAX_NB_RECORDS);
+                    if (paginationMaxNbRecords != null)
+                        objects.PaginationMaxNbRecords = paginationMaxNbRecords.ToInt();
+
+                    var paginationNextPageUri = response.Headers.GetValue(KbConfig.HDR_PAGINATION_NEXT_PAGE_URI);
+                    if (paginationNextPageUri != null)
+                        objects.PaginationNextPageUri = paginationNextPageUri;
+
+                    objects.KillBillHttpClient = this;                   
+                }
+            }
+
+            return obj;
+        }
+
 
         private IRestRequest BuildRequestWithHeaderAndQuery(Method method, string uri, MultiMap<string> options)
         {
@@ -200,19 +234,21 @@ namespace KillBill.Client.Net
         /// <typeparam name="T">RESPONSE type to deserialize.</typeparam>
         /// <param name="request">Request</param>
         /// <returns>Deserialized T from response.</returns>
-        private IRestResponse<T> ExecuteRequest<T>(IRestRequest request) where T : new()
-        {
-            var baseUri = request.Resource.StartsWith("http") ? "" : KbConfig.ServerUrl;
-            var client = CreateClient(baseUri);
-            var response = client.Execute<T>(request);
+        //private IRestResponse<T> ExecuteRequest<T>(IRestRequest request) where T : new()
+        //{
+        //    var baseUri = request.Resource.StartsWith("http") ? "" : KbConfig.ServerUrl;
+        //    var client = CreateClient(baseUri);
+        //    var response = client.Execute<T>(request);
 
-            T defaultObject;
+        //    T defaultObject;
 
-            if (!CheckResponse(response, out defaultObject))
-                response.Data = defaultObject;
+        //    if (!CheckResponse(response, out defaultObject))
+        //        response.Data = defaultObject;
 
-            return response;
-        }
+           
+
+        //    return response;
+        //}
 
 
         /// <summary>
@@ -252,9 +288,10 @@ namespace KillBill.Client.Net
                 {
                     defaultObject = Activator.CreateInstance<T>();
                     return false;
-                }
-                    
+                }                    
             }
+
+           
 
             defaultObject = default(T);
             return true;

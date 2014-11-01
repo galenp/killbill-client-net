@@ -18,6 +18,20 @@ namespace KillBill.Client.Net.Tests
             account.AccountId.Should().Be(AccountId);
         }
 
+
+        [TestCase(0, 1)]
+        public void Get_Accounts(int offset, int limit)
+        {
+            //When
+            var accounts = Client.GetAccounts(offset, limit);
+
+            //Then
+            accounts.Should().NotBeNull();
+            accounts.Should().NotBeEmpty();
+            accounts.Count.Should().BeLessOrEqualTo(limit);
+            accounts.PaginationNextPageUri.Should().NotBeEmpty();
+        }
+
         [Test]
         public void Get_Bundles()
         {
@@ -26,7 +40,7 @@ namespace KillBill.Client.Net.Tests
 
             //Then
             bundles.Should().NotBeNull();
-            bundles.Should().NotBeEmpty();
+            bundles.Should().NotBeEmpty("This will be empty only if there is no test subscription data added to KB.");
         }
 
         [Test]
@@ -53,6 +67,9 @@ namespace KillBill.Client.Net.Tests
             timeline.Account.AccountId.Should().Be(AccountId);
 
         }
+
+
+
         
     }
 }

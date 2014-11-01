@@ -2,7 +2,7 @@
 
 namespace KillBill.Client.Net.Model
 {
-    public class KillBillObject
+    public class KillBillObject : object
     {
         public List<AuditLog> AuditLogs { get; set; }
 

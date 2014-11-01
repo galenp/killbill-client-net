@@ -102,6 +102,18 @@ namespace KillBill.Client.Net
         public const string QUERY_PAYMENT_METHOD_PLUGIN_NAME = "pluginName";
         public const string QUERY_WITH_PLUGIN_INFO = "withPluginInfo";
 
+       /*
+        * Metadata Additional headers
+        */
+        public static string HDR_CREATED_BY = "X-Killbill-CreatedBy";
+        public static string HDR_REASON = "X-Killbill-Reason";
+        public static string HDR_COMMENT = "X-Killbill-Comment";
+        public static string HDR_PAGINATION_CURRENT_OFFSET = "X-Killbill-Pagination-CurrentOffset";
+        public static string HDR_PAGINATION_NEXT_OFFSET = "X-Killbill-Pagination-NextOffset";
+        public static string HDR_PAGINATION_TOTAL_NB_RECORDS = "X-Killbill-Pagination-TotalNbRecords";
+        public static string HDR_PAGINATION_MAX_NB_RECORDS = "X-Killbill-Pagination-MaxNbRecords";
+        public static string HDR_PAGINATION_NEXT_PAGE_URI = "X-Killbill-Pagination-NextPageUri";
+
         static KbConfig()
         {
             ServerUrl = ConfigurationManager.AppSettings["kb.api.url"] ?? ServerUrl;

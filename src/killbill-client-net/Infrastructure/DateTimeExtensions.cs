@@ -2,7 +2,7 @@
 
 namespace KillBill.Client.Net.Infrastructure
 {
-    public static class DateTimeHelperExtensions
+    public static class DateTimeExtensions
     {
         public static string ToDateTimeISO(this DateTime date)
         {

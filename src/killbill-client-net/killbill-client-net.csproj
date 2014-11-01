@@ -83,6 +83,7 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -90,9 +91,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Infrastructure\DateTime.cs" />
+    <Compile Include="Infrastructure\DateTimeExtensions.cs" />
     <Compile Include="HttpClients\HttpClientBasicAuth.cs" />
+    <Compile Include="Infrastructure\RestSharpExtensions.cs" />
     <Compile Include="Infrastructure\MultiMap.cs" />
+    <Compile Include="JSON\JsonNetSerializationSettings.cs" />
     <Compile Include="KbConfig.cs" />
     <Compile Include="IKbHttpClient.cs" />
     <Compile Include="JSON\ShortDateTimeConverter.cs" />
@@ -101,6 +104,7 @@
     <Compile Include="KillBillClientException.cs" />
     <Compile Include="Model\Account.cs" />
     <Compile Include="AuditLevel.cs" />
+    <Compile Include="Model\Accounts.cs" />
     <Compile Include="Model\AccountTimeline.cs" />
     <Compile Include="Model\AuditLog.cs" />
     <Compile Include="Model\Bundle.cs" />
