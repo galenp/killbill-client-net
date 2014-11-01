@@ -11,6 +11,9 @@ namespace KillBill.Client.Net
     {
         private readonly IKbHttpClient client;
         private static MultiMap<string>  DEFAULT_EMPTY_QUERY = new MultiMap<string>();
+        
+       
+
         public KillBillClient(IKbHttpClient client)
         {
             this.client = client;
@@ -44,7 +47,7 @@ namespace KillBill.Client.Net
         public Account CreateAccount(Account account, string createdBy, string reason, string comment, IDictionary<string, string> additionalHeaders = null)
         {
             var options = ParamsWithAudit(createdBy, reason, comment);
-            return client.Post<Account>(KbConfig.ACCOUNTS_PATH, account, options, null, true);
+            return client.PostAndFollow<Account>(KbConfig.ACCOUNTS_PATH, account, options, DEFAULT_EMPTY_QUERY);
         }
 
         public Account UpdateAccount(Account account, string createdBy, string reason, string comment, IDictionary<string, string> additionalHeaders = null)
@@ -60,6 +63,35 @@ namespace KillBill.Client.Net
         {
             var uri = KbConfig.ACCOUNTS_PATH + "/" + accountId + "/" + KbConfig.BUNDLES;
             return client.Get<Bundles>(uri, DEFAULT_EMPTY_QUERY);
+        }
+
+        //CREDITS
+        //-------------------------------------------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Creates a credit against an account. This also creates a new invoice.
+        /// </summary>
+        /// <param name="credit">Credit Object</param>
+        /// <returns>Processed credit object with populated invoice details.</returns>
+        public Credit CreateCredit(Credit credit, string createdBy, string reason, string comment)
+        {
+            if (credit == null)
+                throw new ArgumentNullException("credit");
+            if (credit.AccountId.Equals(Guid.Empty))
+                throw new ArgumentException("Credit#accountId cannot be null");
+            if (credit.CreditAmount <= 0)
+                throw new ArgumentException("Credit#CreditAmount must be greater than 0");
+
+            var options = ParamsWithAudit(createdBy, reason, comment);
+            return client.PostAndFollow<Credit>(KbConfig.CREDITS_PATH, credit, options, DEFAULT_EMPTY_QUERY);
+        }
+
+
+        public Credit GetCredit(Guid creditId, AuditLevel auditLevel)
+        {
+            var uri = KbConfig.CREDITS_PATH + "/" + creditId;
+            var queryparams = new MultiMap<string>();
+            queryparams.Add(KbConfig.QUERY_AUDIT, auditLevel.ToString());
+            return client.Get<Credit>(uri, queryparams);
         }
 
         //INVOICE
@@ -84,7 +116,7 @@ namespace KillBill.Client.Net
             param.Add(KbConfig.QUERY_TARGET_DATE, futureDate.ToDateString());
             var options = ParamsWithAudit(param, createdBy, reason, comment);
 
-            return client.Post<Invoice>(KbConfig.INVOICES_PATH, invoice, options, DEFAULT_EMPTY_QUERY, true);
+            return client.PostAndFollow<Invoice>(KbConfig.INVOICES_PATH, invoice, options, DEFAULT_EMPTY_QUERY);
         }
 
         //INVOICES

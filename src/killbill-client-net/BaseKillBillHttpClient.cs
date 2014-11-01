@@ -52,6 +52,11 @@ namespace KillBill.Client.Net
             return SendRequestAndMaybeFollowLocation<T>(Method.POST, uri, body, options, optionsForFollow, followLocation);
         }
 
+        public T PostAndFollow<T>(string uri, object body, MultiMap<string> options, MultiMap<string> optionsForFollow) where T : new() 
+        {
+            return SendRequestAndMaybeFollowLocation<T>(Method.POST, uri, body, options, optionsForFollow, true);
+        }
+
         // PUT
         //-------------------------------------------------------------------------------
         // - untyped without follow
@@ -72,7 +77,10 @@ namespace KillBill.Client.Net
             return SendRequestAndMaybeFollowLocation<T>(Method.PUT, uri, body, options, optionsForFollow, followLocation);
         }
 
-
+        public T PutAndFollow<T>(string uri, object body, MultiMap<string> options, MultiMap<string> optionsForFollow) where T : new()
+        {
+            return SendRequestAndMaybeFollowLocation<T>(Method.POST, uri, body, options, optionsForFollow, true);
+        }
 
         // COIMMON
         //-------------------------------------------------------------------------------

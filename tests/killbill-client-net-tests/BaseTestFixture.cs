@@ -11,6 +11,7 @@ namespace KillBill.Client.Net.Tests
 
         protected readonly string CreatedBy = "Testing User";
         protected readonly string Reason = "KillBill Api Test";
+        protected Random Random = new Random();
 
         public BaseTestFixture()
         {

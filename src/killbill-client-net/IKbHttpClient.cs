@@ -13,9 +13,12 @@ namespace KillBill.Client.Net
         IRestResponse Post(string uri, object body, MultiMap<string> options);
         T Post<T>(string uri, object body, MultiMap<string> options) where T : new();
         T Post<T>(string uri, object body, MultiMap<string> options, MultiMap<string> optionsForFollow,bool followLocation) where T : new();
+        T PostAndFollow<T>(string uri, object body, MultiMap<string> options, MultiMap<string> optionsForFollow ) where T : new();
 
         IRestResponse Put(string uri, object body, MultiMap<string> options);
         T Put<T>(string uri, object body, MultiMap<string> options) where T : new();
         T Put<T>(string uri, object body, MultiMap<string> options, MultiMap<string> optionsForFollow, bool followLocation) where T : new();
+        
+        T PutAndFollow<T>(string uri, object body, MultiMap<string> options, MultiMap<string> optionsForFollow) where T : new();
     }
 }

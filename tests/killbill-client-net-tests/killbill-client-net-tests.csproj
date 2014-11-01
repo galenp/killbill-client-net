@@ -97,6 +97,7 @@
     <Compile Include="Creation\AccountCreationTests.cs" />
     <Compile Include="AccountTests.cs" />
     <Compile Include="BaseTestFixture.cs" />
+    <Compile Include="Creation\CreditCreationTests.cs" />
     <Compile Include="Creation\InvoiceCreationTests.cs" />
     <Compile Include="InvoiceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

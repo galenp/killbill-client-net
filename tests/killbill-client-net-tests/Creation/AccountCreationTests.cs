@@ -76,8 +76,7 @@ namespace KillBill.Client.Net.Tests.Creation
             {
                 AccountId = AccountId,
                 Address1 = newAddress1,
-                Address2 = newAddress2,
-                Currency = "USD"
+                Address2 = newAddress2
             };
             
 
