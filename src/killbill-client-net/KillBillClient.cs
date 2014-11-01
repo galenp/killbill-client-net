@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Contracts;
-using System.Security.Policy;
 using System.Text;
 using KillBill.Client.Net.Infrastructure;
 using KillBill.Client.Net.Model;
@@ -345,10 +343,12 @@ namespace KillBill.Client.Net
         //-------------------------------------------------------------------------------------------------------------------------------------
 
         // subscription:create
-        public Subscription CreateSubscription(Subscription subscription, string createdBy, string reason)
+        public Subscription GetSubscription(Guid subscriptionId)
         {
-            return CreateSubscription(subscription, null, createdBy, reason, null);
+            var uri = KbConfig.SUBSCRIPTIONS_PATH + "/" + subscriptionId;
+            return client.Get<Subscription>(uri, DEFAULT_EMPTY_QUERY);
         }
+
         public Subscription CreateSubscription(Subscription subscription, string createdBy, string reason, string comment)
         {
             return CreateSubscription(subscription, null, createdBy, reason, comment);
@@ -367,6 +367,9 @@ namespace KillBill.Client.Net
 
             return client.Post<Subscription>(KbConfig.SUBSCRIPTIONS_PATH, subscription, options, null, true);
         }
+
+        // subscription:update
+
 
         // subscription:cancel
 
