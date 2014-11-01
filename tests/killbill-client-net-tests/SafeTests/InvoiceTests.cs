@@ -1,9 +1,7 @@
-﻿using System;
-using System.Linq;
-using FluentAssertions;
+﻿using FluentAssertions;
 using NUnit.Framework;
 
-namespace KillBill.Client.Net.Tests
+namespace KillBill.Client.Net.Tests.SafeTests
 {
     [TestFixture]
     public class InvoiceTests : BaseTestFixture

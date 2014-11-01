@@ -94,15 +94,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Creation\AccountCreationTests.cs" />
-    <Compile Include="AccountTests.cs" />
+    <Compile Include="ModificationTests\AccountModificationTests.cs" />
+    <Compile Include="SafeTests\AccountTests.cs" />
     <Compile Include="BaseTestFixture.cs" />
-    <Compile Include="Creation\CreditCreationTests.cs" />
-    <Compile Include="Creation\InvoiceCreationTests.cs" />
-    <Compile Include="InvoiceTests.cs" />
-    <Compile Include="PaginationTests.cs" />
+    <Compile Include="ModificationTests\CreditModificationTests.cs" />
+    <Compile Include="ModificationTests\InvoiceModificationTests.cs" />
+    <Compile Include="SafeTests\InvoiceTests.cs" />
+    <Compile Include="SafeTests\PaginationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Creation\SubscriptionCreationTests.cs" />
+    <Compile Include="ModificationTests\SubscriptionModificationTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

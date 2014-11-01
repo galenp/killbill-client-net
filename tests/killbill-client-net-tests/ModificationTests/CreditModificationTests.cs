@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using KillBill.Client.Net.Model;
 using NUnit.Framework;
 
-namespace KillBill.Client.Net.Tests.Creation
+namespace KillBill.Client.Net.Tests.ModificationTests
 {
     [TestFixture]
-    public class CreditCreationTests : BaseTestFixture
+    public class CreditModificationTests : BaseTestFixture
     {
 
         [Test]

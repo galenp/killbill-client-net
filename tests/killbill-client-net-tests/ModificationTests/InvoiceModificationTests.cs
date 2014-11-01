@@ -4,11 +4,11 @@ using FluentAssertions;
 using KillBill.Client.Net.Model;
 using NUnit.Framework;
 
-namespace KillBill.Client.Net.Tests.Creation
+namespace KillBill.Client.Net.Tests.ModificationTests
 {
 
     [TestFixture]
-    public class InvoiceCreationTests : BaseTestFixture
+    public class InvoiceModificationTests : BaseTestFixture
     {
 
         [Test]

@@ -3,10 +3,10 @@ using FluentAssertions;
 using KillBill.Client.Net.Model;
 using NUnit.Framework;
 
-namespace KillBill.Client.Net.Tests.Creation
+namespace KillBill.Client.Net.Tests.ModificationTests
 {
     [TestFixture]
-    public class AccountCreationTests : BaseTestFixture
+    public class AccountModificationTests : BaseTestFixture
     {
      
         private Account account;

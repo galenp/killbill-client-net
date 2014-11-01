@@ -3,10 +3,10 @@ using FluentAssertions;
 using KillBill.Client.Net.Model;
 using NUnit.Framework;
 
-namespace KillBill.Client.Net.Tests.Creation
+namespace KillBill.Client.Net.Tests.ModificationTests
 {
     [TestFixture]
-    public class SubscriptionCreationTests : BaseTestFixture
+    public class SubscriptionModificationTests : BaseTestFixture
     {
         private Subscription subscription;
       
