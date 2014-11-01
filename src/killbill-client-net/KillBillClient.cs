@@ -108,6 +108,10 @@ namespace KillBill.Client.Net
             return client.Get<Invoice>(uri, options);
         }
 
+        /// <summary>
+        /// Triggers an invoice RUN!
+        /// </summary>
+        /// <remarks>Don't be fooled by the method name... this SHOULD NOT be used to create invoices. Invoices are created as a byproduct of other actions like 'Creating Credits', 'External Charges'</remarks>
         public Invoice CreateInvoice(Guid accountId, Invoice invoice, DateTime futureDate, string createdBy, string reason,
             string comment)
         {
@@ -137,6 +141,11 @@ namespace KillBill.Client.Net
 
         //INVOICE ITEM
         //-------------------------------------------------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Executes an 'external charge' action... note if no InvoiceId is provided on each charge then the server will create a new invoice for the batch.
+        /// </summary>
+        /// <remarks>The currency on each charges needs to be the same as the currency on the referenced account.</remarks>
+        /// <returns>List of processed charges with invoice references.</returns>
         public List<InvoiceItem> CreateExternalCharge(IEnumerable<InvoiceItem> externalCharges, DateTime requestedDate,
             bool autoPay, string createdBy, string reason, string comment)
         {
