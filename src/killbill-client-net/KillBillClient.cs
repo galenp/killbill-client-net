@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
+using System.Text;
 using KillBill.Client.Net.Infrastructure;
 using KillBill.Client.Net.Model;
 
@@ -146,6 +147,17 @@ namespace KillBill.Client.Net
             return client.Get<Invoices>(uri, options);
         }
 
+
+        public Invoices SearchInvoices(string key, long offset = 0L, long limit= 100L, AuditLevel auditLevel = AuditLevel.NONE)
+        {
+            var utf = Encoding.UTF8.GetBytes(key);
+            var uri = KbConfig.INVOICES_PATH + "/" + KbConfig.SEARCH + "/" + Encoding.UTF8.GetString(utf); ;
+            var queryparams = new MultiMap<string>();
+            queryparams.Add(KbConfig.QUERY_SEARCH_OFFSET, offset.ToString());
+            queryparams.Add(KbConfig.QUERY_SEARCH_LIMIT, limit.ToString());
+            queryparams.Add(KbConfig.QUERY_SEARCH_LIMIT, auditLevel.ToString());
+            return client.Get<Invoices>(uri, queryparams);
+        }
 
         //INVOICE ITEM
         //-------------------------------------------------------------------------------------------------------------------------------------
