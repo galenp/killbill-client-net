@@ -12,6 +12,7 @@ namespace KillBill.Client.Net
     {
         private readonly IKbHttpClient client;
         private static MultiMap<string>  DEFAULT_EMPTY_QUERY = new MultiMap<string>();
+        private const AuditLevel DEFAULT_AUDIT_LEVEL = AuditLevel.NONE;
         
        
 
@@ -57,6 +58,8 @@ namespace KillBill.Client.Net
             var options = ParamsWithAudit(createdBy, reason, comment);
             return client.Put<Account>(uri, account, options);
         }
+
+      
 
         //BUNDLES
         //-------------------------------------------------------------------------------------------------------------------------------------
@@ -114,15 +117,15 @@ namespace KillBill.Client.Net
             return client.PostAndFollow<Invoice>(KbConfig.INVOICES_PATH, invoice, options, DEFAULT_EMPTY_QUERY);
         }
 
-        public Invoice GetInvoice(int invoiceNumber, bool withItems = false, AuditLevel auditLevel = AuditLevel.NONE)
+        public Invoice GetInvoice(int invoiceNumber, bool withItems = false, AuditLevel auditLevel = DEFAULT_AUDIT_LEVEL)
         {
             return GetInvoiceByIdOrNumber(invoiceNumber.ToString(), withItems, auditLevel);
         }
-        public Invoice GetInvoice(string invoiceIdOrNumber, bool withItems=false, AuditLevel auditLevel = AuditLevel.NONE)
+        public Invoice GetInvoice(string invoiceIdOrNumber, bool withItems=false, AuditLevel auditLevel = DEFAULT_AUDIT_LEVEL)
         {
             return GetInvoiceByIdOrNumber(invoiceIdOrNumber, withItems, auditLevel);
         }
-        public Invoice GetInvoiceByIdOrNumber(string invoiceIdOrNumber, bool withItems = false, AuditLevel auditLevel = AuditLevel.NONE)
+        public Invoice GetInvoiceByIdOrNumber(string invoiceIdOrNumber, bool withItems = false, AuditLevel auditLevel = DEFAULT_AUDIT_LEVEL)
         {
             var uri = KbConfig.INVOICES_PATH + "/" + invoiceIdOrNumber;
             var queryparams = new MultiMap<string>();
@@ -134,7 +137,7 @@ namespace KillBill.Client.Net
 
         //INVOICES
         //-------------------------------------------------------------------------------------------------------------------------------------
-        public Invoices GetInvoicesForAccount(Guid accountId, bool withItems = false, bool unpaidOnly = false, AuditLevel auditLevel = AuditLevel.NONE)
+        public Invoices GetInvoicesForAccount(Guid accountId, bool withItems = false, bool unpaidOnly = false, AuditLevel auditLevel = DEFAULT_AUDIT_LEVEL)
         {
 
             var uri = KbConfig.ACCOUNTS_PATH + "/" + accountId + KbConfig.INVOICES;
@@ -148,7 +151,7 @@ namespace KillBill.Client.Net
         }
 
 
-        public Invoices SearchInvoices(string key, long offset = 0L, long limit= 100L, AuditLevel auditLevel = AuditLevel.NONE)
+        public Invoices SearchInvoices(string key, long offset = 0L, long limit= 100L, AuditLevel auditLevel = DEFAULT_AUDIT_LEVEL)
         {
             var utf = Encoding.UTF8.GetBytes(key);
             var uri = KbConfig.INVOICES_PATH + "/" + KbConfig.SEARCH + "/" + Encoding.UTF8.GetString(utf); ;

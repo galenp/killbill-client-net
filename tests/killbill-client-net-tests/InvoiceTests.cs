@@ -33,12 +33,9 @@ namespace KillBill.Client.Net.Tests
             invoice.Balance.Should().BeGreaterThan(0);
         }
 
-        [Test]
-        public void Search_Invoices_By_InvoiceId()
+        [TestCase("5149bcae-f0de-4bc8-9b32-a6e1bc5f83ed")]
+        public void Search_Invoices_By_InvoiceId(string searchTerm)
         {
-            //Given
-            const string searchTerm = "5149bcae-f0de-4bc8-9b32-a6e1bc5f83ed";
-
             //When
             var invoices = Client.SearchInvoices(searchTerm);
 
@@ -48,12 +45,9 @@ namespace KillBill.Client.Net.Tests
             invoices.Should().ContainSingle(x => x.InvoiceId.ToString() == searchTerm);
         }
 
-        [Test]
-        public void Search_Invoices_By_InvoiceNumber()
+        [TestCase("5")]
+        public void Search_Invoices_By_InvoiceNumber(string searchTerm)
         {
-            //Given
-            const string searchTerm = "5";
-
             //When
             var searchResults = Client.SearchInvoices(searchTerm);
 
