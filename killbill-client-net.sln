@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30723.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "killbill-client-net", "src\killbill-client-net\killbill-client-net.csproj", "{5AE3B859-2B8F-473F-9C9F-865F49A63E06}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "killbill-client-net-tests", "tests\killbill-client-net-tests\killbill-client-net-tests.csproj", "{7E6C80BD-972C-4BFD-A4FF-40583633442A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B8C9AAE6-36FE-44C0-B805-FBD4A4135838}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5AE3B859-2B8F-473F-9C9F-865F49A63E06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5AE3B859-2B8F-473F-9C9F-865F49A63E06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5AE3B859-2B8F-473F-9C9F-865F49A63E06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5AE3B859-2B8F-473F-9C9F-865F49A63E06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E6C80BD-972C-4BFD-A4FF-40583633442A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E6C80BD-972C-4BFD-A4FF-40583633442A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E6C80BD-972C-4BFD-A4FF-40583633442A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E6C80BD-972C-4BFD-A4FF-40583633442A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
