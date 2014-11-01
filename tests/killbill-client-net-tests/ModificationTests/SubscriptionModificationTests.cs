@@ -8,14 +8,12 @@ namespace KillBill.Client.Net.Tests.ModificationTests
     [TestFixture]
     public class SubscriptionModificationTests : BaseTestFixture
     {
-        private Subscription subscription;
-      
-      
-        [SetUp]
-        public void Setup()
+
+        [Test]
+        public void Create_Subscription()
         {
-           
-            subscription = new Subscription
+            //Given
+            var subscription =new Subscription
             {
                 AccountId = AccountId,
                 BundleId = Guid.NewGuid(),
@@ -26,17 +24,13 @@ namespace KillBill.Client.Net.Tests.ModificationTests
                 PriceList = "DEFAULT",
                 StartDate = DateTime.Now
             };
-        }
 
-        [Test]
-        public void Create_Subscription()
-        {
             //When
-            var createdBunde = Client.CreateSubscription(subscription, "test user", "testing bundle creation", "Create_Bundle()");
+            var bundle = Client.CreateSubscription(subscription, "test user", "testing bundle creation", "Create_Bundle()");
 
             //Then
-            createdBunde.Should().NotBeNull();
-            createdBunde.AccountId.Should().Be(AccountId);
+            bundle.Should().NotBeNull();
+            bundle.AccountId.Should().Be(AccountId);
         }
 
 

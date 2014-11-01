@@ -116,6 +116,7 @@
     <Compile Include="Model\EventBaseSubscription.cs" />
     <Compile Include="Model\EventSubscription.cs" />
     <Compile Include="Model\Invoice.cs" />
+    <Compile Include="Model\InvoiceEmail.cs" />
     <Compile Include="Model\InvoiceItem.cs" />
     <Compile Include="Model\Invoices.cs" />
     <Compile Include="Model\KillBillObject.cs" />

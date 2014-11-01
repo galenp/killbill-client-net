@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
+using System.Security.Policy;
 using System.Text;
 using KillBill.Client.Net.Infrastructure;
 using KillBill.Client.Net.Model;
@@ -268,6 +269,21 @@ namespace KillBill.Client.Net
             return client.Post<List<InvoiceItem>>(uri, externalCharges, fullOptions);
         }
 
+        //INVOICE EMAIL
+        //-------------------------------------------------------------------------------------------------------------------------------------
+        public InvoiceEmail GetEmailNotificationsForAccount(Guid accountId)
+        {
+            var uri = KbConfig.ACCOUNTS_PATH + "/" + accountId + "/" + KbConfig.EMAIL_NOTIFICATIONS;
+            return client.Get<InvoiceEmail>(uri, DEFAULT_EMPTY_QUERY);
+        }
+
+        public void UpdateEmailNotificationsForAccount(InvoiceEmail invoiceEmail, string createdBy, string reason,
+            string comment)
+        {
+            var uri = KbConfig.ACCOUNTS_PATH + "/" + invoiceEmail.AccountId + "/" + KbConfig.EMAIL_NOTIFICATIONS;
+            var options = ParamsWithAudit(createdBy, reason, comment);
+            client.Put(uri, invoiceEmail, options);
+        }
       
         //SUBSCRIPTION
         //-------------------------------------------------------------------------------------------------------------------------------------

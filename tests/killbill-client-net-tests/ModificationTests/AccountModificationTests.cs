@@ -47,22 +47,6 @@ namespace KillBill.Client.Net.Tests.ModificationTests
             createdAccount.ExternalKey.Should().Be(account.ExternalKey);
             accountId = createdAccount.AccountId;
         }
-       
-
-        [Test]
-       
-        public void Get_Single_Account()
-        {
-            //Given
-            accountId.Should().NotBeEmpty();
-
-            //When
-            var getAccount = Client.GetAccount(accountId);
-
-            //Then
-            getAccount.Should().NotBeNull();
-            getAccount.AccountId.Should().Be(accountId);
-        }
 
         [Test]
         
@@ -118,6 +102,24 @@ namespace KillBill.Client.Net.Tests.ModificationTests
             Client.RemoveEmailFromAccount(email, CreatedBy, Reason, "AccountModificationTests:Remove_Email_From_Account");
 
             //Then -- it should not error.....
+        }
+
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void Update_Email_Notifications_For_Account(bool notificationSetting)
+        {
+            //Given
+            var invoiceEmail = new InvoiceEmail {AccountId = AccountId, IsNotifiedForInvoices = notificationSetting};
+
+            //When
+            Client.UpdateEmailNotificationsForAccount(invoiceEmail, CreatedBy, Reason, "AccountModificationTests:Update_Email_Notifications_For_Account");
+
+            //Then
+            var setting = Client.GetEmailNotificationsForAccount(AccountId);
+            setting.Should().NotBeNull();
+            setting.AccountId.Should().Be(AccountId);
+            setting.IsNotifiedForInvoices.Should().Be(notificationSetting);
         }
     }
 }
