@@ -143,6 +143,16 @@ namespace KillBill.Client.Net
             return client.Get<Bundles>(uri, DEFAULT_EMPTY_QUERY);
         }
 
+        public Bundles GetBundles(long offset = 0L, long limit = 100L, AuditLevel auditLevel = DEFAULT_AUDIT_LEVEL)
+        {
+            var uri = KbConfig.BUNDLES_PATH + "/" + KbConfig.PAGINATION;
+            var queryparams = new MultiMap<string>();
+            queryparams.Add(KbConfig.QUERY_SEARCH_OFFSET, offset.ToString());
+            queryparams.Add(KbConfig.QUERY_SEARCH_LIMIT, limit.ToString());
+            queryparams.Add(KbConfig.QUERY_AUDIT, auditLevel.ToString());
+            return client.Get<Bundles>(uri, queryparams);
+        }
+
         //CREDITS
         //-------------------------------------------------------------------------------------------------------------------------------------
         /// <summary>
@@ -232,7 +242,7 @@ namespace KillBill.Client.Net
             var queryparams = new MultiMap<string>();
             queryparams.Add(KbConfig.QUERY_SEARCH_OFFSET, offset.ToString());
             queryparams.Add(KbConfig.QUERY_SEARCH_LIMIT, limit.ToString());
-            queryparams.Add(KbConfig.QUERY_SEARCH_LIMIT, auditLevel.ToString());
+            queryparams.Add(KbConfig.QUERY_AUDIT, auditLevel.ToString());
             return client.Get<Invoices>(uri, queryparams);
         }
 
