@@ -101,6 +101,7 @@
     <Compile Include="KillBillClientException.cs" />
     <Compile Include="Model\Account.cs" />
     <Compile Include="AuditLevel.cs" />
+    <Compile Include="Model\AccountTimeline.cs" />
     <Compile Include="Model\AuditLog.cs" />
     <Compile Include="Model\Bundle.cs" />
     <Compile Include="Model\Bundles.cs" />

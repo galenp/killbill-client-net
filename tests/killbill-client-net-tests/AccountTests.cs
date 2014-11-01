@@ -39,6 +39,20 @@ namespace KillBill.Client.Net.Tests
             invoices.Should().NotBeNull("There should be a test invoice in the system, if not create one");
             invoices.Should().NotBeEmpty("Service returns a list of invoices.");
         }
+
+
+        [Test]
+        public void Get_Account_Timeline()
+        {
+            //When
+            var timeline = Client.GetAccountTimeline(AccountId);
+
+            //Then
+            timeline.Should().NotBeNull();
+            timeline.Account.Should().NotBeNull();
+            timeline.Account.AccountId.Should().Be(AccountId);
+
+        }
         
     }
 }

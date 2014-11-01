@@ -59,7 +59,15 @@ namespace KillBill.Client.Net
             return client.Put<Account>(uri, account, options);
         }
 
-      
+        //ACCOUNTTIMELINE
+        //-------------------------------------------------------------------------------------------------------------------------------------
+        public AccountTimeline GetAccountTimeline(Guid accountId, AuditLevel auditLevel = DEFAULT_AUDIT_LEVEL)
+        {
+            var uri = KbConfig.ACCOUNTS_PATH + "/" + accountId + "/" + KbConfig.TIMELINE;
+            var queryparams = new MultiMap<string>();
+            queryparams.Add(KbConfig.QUERY_AUDIT, auditLevel.ToString());
+            return client.Get<AccountTimeline>(uri, queryparams);
+        }
 
         //BUNDLES
         //-------------------------------------------------------------------------------------------------------------------------------------
