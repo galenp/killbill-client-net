@@ -1,5 +1,6 @@
 About
 ===
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/galenp/killbill-client-net?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 I'm currently evaluating using the kill-bill billing and subscription system in a new .NET based product. There is currently no API library available for .net in the killbill org repo.
 
 I'm going to use the existing JAVA api located [here](https://github.com/killbill/killbill-client-java) as a reference.
