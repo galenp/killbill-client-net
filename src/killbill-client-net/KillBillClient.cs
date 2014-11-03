@@ -338,7 +338,38 @@ namespace KillBill.Client.Net
             var options = ParamsWithAudit(createdBy, reason, comment);
             client.Put(uri, invoiceEmail, options);
         }
-      
+
+        //TENANT
+        //-------------------------------------------------------------------------------------------------------------------------------------
+        public Tenant CreateTenant(Tenant tenant, string createdBy, string reason, string comment)
+        {
+            if (tenant == null)
+                throw new ArgumentNullException("tenant");
+
+            if (string.IsNullOrEmpty(tenant.ApiKey) || string.IsNullOrEmpty(tenant.ApiSecret)) 
+                throw new ArgumentException("tenant#apiKey and tenant#apiSecret must not be empty");
+
+            
+            var queryparams = ParamsWithAudit(createdBy, reason, comment);
+            return client.PostAndFollow<Tenant>(KbConfig.TENANTS_PATH, tenant, queryparams, DEFAULT_EMPTY_QUERY);
+        }
+
+        public TenantKey RegisterCallBackNotificationForTenant(string callback, string createdBy, string reason,
+            string comment)
+        {
+            var options = new MultiMap<string>();
+            options.Add(KbConfig.QUERY_NOTIFICATION_CALLBACK, callback);
+            var queryparams = ParamsWithAudit(options, createdBy, reason, comment);
+            var uri = KbConfig.TENANTS_PATH + "/" + KbConfig.REGISTER_NOTIFICATION_CALLBACK;
+            return client.PostAndFollow<TenantKey>(uri, null, queryparams, DEFAULT_EMPTY_QUERY);
+        }
+
+        public TenantKey RetrieveRegisteredCallBacks()
+        {
+            var uri = KbConfig.TENANTS_PATH + "/" + KbConfig.REGISTER_NOTIFICATION_CALLBACK;
+            return client.Get<TenantKey>(uri, DEFAULT_EMPTY_QUERY);
+        }
+
         //SUBSCRIPTION
         //-------------------------------------------------------------------------------------------------------------------------------------
 

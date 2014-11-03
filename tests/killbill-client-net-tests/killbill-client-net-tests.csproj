@@ -95,6 +95,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ModificationTests\AccountModificationTests.cs" />
+    <Compile Include="ModificationTests\TenantModificationTests.cs" />
     <Compile Include="SafeTests\AccountTests.cs" />
     <Compile Include="BaseTestFixture.cs" />
     <Compile Include="ModificationTests\CreditModificationTests.cs" />
