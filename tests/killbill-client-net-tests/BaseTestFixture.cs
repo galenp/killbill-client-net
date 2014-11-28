@@ -5,7 +5,7 @@ namespace KillBill.Client.Net.Tests
 {
     public class BaseTestFixture
     {
-        protected readonly Guid AccountId = new Guid("ddacacf1-f81a-4b83-a7f1-85fd2e13902e");
+        protected readonly Guid AccountId = new Guid("d8d4d0b6-9dd7-478d-801b-013eb335ff27");
         protected readonly Guid BundleId = new Guid("7a527d56-f40b-4830-8ac5-7e8c85a2348d");
         protected readonly KillBillClient Client;
 
