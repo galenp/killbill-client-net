@@ -58,6 +58,7 @@ namespace KillBill.Client.Net
         public static string PLUGINS_PATH = "/" + PLUGINS;
         public static string REFUNDS = "refunds";
         public static string REGISTER_NOTIFICATION_CALLBACK = "registerNotificationCallback";
+        public static string LEGACY_REGISTER_NOTIFICATION_CALLBACK = "REGISTER_NOTIFICATION_CALLBACK";
         public static string SEARCH = "search";
         public static string SECURITY = "security";
         public static string SECURITY_PATH = PREFIX + "/" + SECURITY;

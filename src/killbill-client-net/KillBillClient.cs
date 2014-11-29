@@ -439,7 +439,7 @@ namespace KillBill.Client.Net
             string comment)
         {
             var queryparams = ParamsWithAudit(createdBy, reason, comment);
-            var uri = KbConfig.TENANTS_PATH + "/" + KbConfig.REGISTER_NOTIFICATION_CALLBACK;
+            var uri = KbConfig.TENANTS_PATH + "/" + KbConfig.LEGACY_REGISTER_NOTIFICATION_CALLBACK;
             client.Delete(uri, queryparams);
         }
         public TenantKey RegisterCallBackNotificationForTenant(string callback, string createdBy, string reason,
