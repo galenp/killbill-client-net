@@ -9,27 +9,10 @@ namespace KillBill.Client.Net.Tests.ModificationTests
     public class TenantModificationTests : BaseTestFixture
     {
 
-        [Test]
-        public void Create_Tenant()
-        {
-            //Given
-            var apiKey = Guid.NewGuid().ToString();
-            var externalKey = Guid.NewGuid().ToString();            
-            var tenant = new Tenant()
-            {
-                ApiKey = apiKey,
-                ApiSecret = Guid.NewGuid().ToString(),
-                ExternalKey = externalKey
-            };
+       
 
-            //When
-            var processed = Client.CreateTenant(tenant, CreatedBy, Reason, "TenantModificationTests:Create_Tenant");
 
-            //Then
-            processed.Should().NotBeNull();
-            processed.TenantId.Should().NotBeEmpty();
-            processed.ApiKey.Should().Be(apiKey);
-        }
+
 
         [Test]
         public void Register_Notification_Callback()
@@ -42,6 +25,17 @@ namespace KillBill.Client.Net.Tests.ModificationTests
 
             //Then
             tenantKey.Should().NotBeNull();
+        }
+
+
+        [TestCase("d632f46a-15cf-409a-83c1-34390b983a12")]
+        public void Delete_Notification_Callback(string tenantIdString)
+        {
+            //Given
+            var tenantId = Guid.Parse(tenantIdString);
+
+            //When
+            Client.DeleteCallbackNotificationForTenanr(tenantId, CreatedBy, Reason, "TenantModificationTests:Delete_Notification_Callback");
         }
 
         [Test]

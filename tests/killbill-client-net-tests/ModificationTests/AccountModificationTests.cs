@@ -35,18 +35,7 @@ namespace KillBill.Client.Net.Tests.ModificationTests
           
         }
 
-        [Test]
        
-        public void Create_Account()
-        {
-            //When
-            var createdAccount = Client.CreateAccount(account, userName, reason, comment);
-
-            //Then
-            createdAccount.Should().NotBeNull();
-            createdAccount.ExternalKey.Should().Be(account.ExternalKey);
-            accountId = createdAccount.AccountId;
-        }
 
         [Test]
         

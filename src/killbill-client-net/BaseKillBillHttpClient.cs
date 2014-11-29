@@ -84,9 +84,14 @@ namespace KillBill.Client.Net
         }
 
 
-        // PUT
+        // DELETE
         //-------------------------------------------------------------------------------
         // - untyped without follow
+        public IRestResponse Delete(string uri, MultiMap<string> options)
+        {
+            return SendRequest(Method.DELETE, uri, null, options);
+        }
+
         public IRestResponse Delete(string uri, object body, MultiMap<string> options)
         {
             return SendRequest(Method.DELETE, uri, body, options);
@@ -329,7 +334,7 @@ namespace KillBill.Client.Net
             return new RestClient(baseUri)
             {
                 Authenticator = ApiAuthentication(),
-                Proxy = new WebProxy("http://localhost:8888")
+                //Proxy = new WebProxy("http://localhost:8888")
             };
         }
 

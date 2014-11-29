@@ -20,6 +20,7 @@ namespace KillBill.Client.Net
         T Put<T>(string uri, object body, MultiMap<string> options, MultiMap<string> optionsForFollow, bool followLocation) where T : new();        
         T PutAndFollow<T>(string uri, object body, MultiMap<string> options, MultiMap<string> optionsForFollow) where T : new();
 
+        IRestResponse Delete(string uri, MultiMap<string> options);
         IRestResponse Delete(string uri, object body, MultiMap<string> options);
         T Delete<T>(string uri, object body, MultiMap<string> options) where T : new();
         T Delete<T>(string uri, object body, MultiMap<string> options, MultiMap<string> optionsForFollow, bool followLocation) where T : new();

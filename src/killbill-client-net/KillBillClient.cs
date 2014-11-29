@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Text;
 using KillBill.Client.Net.Infrastructure;
 using KillBill.Client.Net.Model;
+using RestSharp.Contrib;
 
 namespace KillBill.Client.Net
 {
@@ -339,6 +341,84 @@ namespace KillBill.Client.Net
             client.Put(uri, invoiceEmail, options);
         }
 
+        //PAYMENT
+        //-------------------------------------------------------------------------------------------------------------------------------------
+        public Payment CreatePayment(Guid accountId, PaymentTransaction paymentTransaction, string createdBy, string reason, string comment)
+        {
+            return CreatePayment(accountId, null, paymentTransaction, new Dictionary<string, string>(), createdBy, reason, comment);
+        }
+
+        public Payment CreatePayment(Guid accountId, PaymentTransaction paymentTransaction, Dictionary<string, string> pluginProperties, string createdBy, string reason, string comment)
+        {
+            return CreatePayment(accountId, null, paymentTransaction, pluginProperties, createdBy, reason, comment);
+        }
+        public Payment CreatePayment(Guid accountId, Guid? paymentMethodId, PaymentTransaction paymentTransaction, string createdBy, string reason, string comment)
+        {
+            return CreatePayment(accountId, paymentMethodId, paymentTransaction, new Dictionary<string, string>(), createdBy, reason, comment);
+        }
+        public Payment CreatePayment(Guid accountId, Guid? paymentMethodId, PaymentTransaction paymentTransaction, Dictionary<string, string> pluginProperties, string createdBy, string reason, string comment)
+        {
+
+            var allowedTransactionTypes = new[] {"AUTHORIZE", "CREDIT", "PURCHASE"};
+            if (accountId.Equals(Guid.Empty))
+                throw new ArgumentException("createPayment#accountId must not be empty");
+
+            if (paymentTransaction == null)
+                throw new ArgumentNullException("paymentTransaction");
+
+            if (!allowedTransactionTypes.Contains(paymentTransaction.TransactionType))
+                throw new ArgumentException("Invalid paymentTransaction type " + paymentTransaction.TransactionType);
+
+            if (paymentTransaction.Amount <= 0)
+                throw new ArgumentException("PaymentTransaction#amount cannot be 0 or less");
+
+            if (paymentTransaction.Currency == null)
+                throw new ArgumentException("PaymentTransaction#currency cannot be null");
+
+            var uri = KbConfig.ACCOUNTS_PATH + "/" + accountId + "/" + KbConfig.PAYMENTS;
+
+            var param = new MultiMap<string>();
+
+            if (paymentMethodId.HasValue)
+                param.Add("paymentMethodId", paymentMethodId.ToString());
+
+            StorePluginPropertiesAsParams(pluginProperties, ref param);
+            
+            var queryParams = ParamsWithAudit(param,createdBy,reason,comment);
+
+            return client.PostAndFollow<Payment>(uri, paymentTransaction, queryParams, DEFAULT_EMPTY_QUERY);
+
+        }
+
+        //PAYMENT METHODS
+        //-------------------------------------------------------------------------------------------------------------------------------------
+        public PaymentMethod GetPaymentMethod(Guid paymentMethodId, bool withPluginInfo = false,
+            AuditLevel auditLevel = DEFAULT_AUDIT_LEVEL)
+        {
+            var uri = KbConfig.PAYMENT_METHODS_PATH + "/" + paymentMethodId;
+
+            var options = new MultiMap<string>();
+            options.Add(KbConfig.QUERY_WITH_PLUGIN_INFO, withPluginInfo.ToString());
+            options.Add(KbConfig.QUERY_AUDIT, auditLevel.ToString());
+
+            return client.Get<PaymentMethod>(uri, options);
+
+        }
+        public PaymentMethod CreatePaymentMethod(PaymentMethod paymentMethod, string createdBy, string reason,
+            string comment)
+        {
+            if (paymentMethod == null)
+                throw new ArgumentNullException("paymentMethod");
+
+            if (paymentMethod.AccountId.Equals(Guid.Empty) || string.IsNullOrEmpty(paymentMethod.PluginName))
+                throw new ArgumentException("paymentMethod#accountId and paymentMethod#pluginName must not be empty");
+
+            var uri = KbConfig.ACCOUNTS_PATH + "/" + paymentMethod.AccountId + "/" + KbConfig.PAYMENT_METHODS;
+            var queryparams = ParamsWithAudit(createdBy, reason, comment);
+            return client.PostAndFollow<PaymentMethod>(uri, paymentMethod, queryparams, DEFAULT_EMPTY_QUERY);
+
+        }
+
         //TENANT
         //-------------------------------------------------------------------------------------------------------------------------------------
         public Tenant CreateTenant(Tenant tenant, string createdBy, string reason, string comment)
@@ -354,6 +434,14 @@ namespace KillBill.Client.Net
             return client.PostAndFollow<Tenant>(KbConfig.TENANTS_PATH, tenant, queryparams, DEFAULT_EMPTY_QUERY);
         }
 
+
+        public void DeleteCallbackNotificationForTenanr(Guid tenantId, string createdBy, string reason,
+            string comment)
+        {
+            var queryparams = ParamsWithAudit(createdBy, reason, comment);
+            var uri = KbConfig.TENANTS_PATH + "/" + KbConfig.REGISTER_NOTIFICATION_CALLBACK;
+            client.Delete(uri, queryparams);
+        }
         public TenantKey RegisterCallBackNotificationForTenant(string callback, string createdBy, string reason,
             string comment)
         {
@@ -422,6 +510,18 @@ namespace KillBill.Client.Net
             options.Add(KbConfig.AUDIT_OPTION_REASON, reason);
 
             return options;
+        }
+
+        private void StorePluginPropertiesAsParams(Dictionary<string, string> pluginProperties,
+            ref MultiMap<string> queryParams)
+        {
+            foreach (var key in pluginProperties.Keys)
+            {
+                if (queryParams == null)
+                    queryParams = new MultiMap<string>();
+
+                queryParams.Add(KbConfig.QUERY_PLUGIN_PROPERTY, string.Format("{0}={1}", Encoding.UTF8.GetBytes(key), HttpUtility.UrlEncode(pluginProperties[key])));
+            }
         }
     }
 }
