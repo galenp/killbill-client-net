@@ -1,4 +1,4 @@
-
+distribution/
 src/killbill-client-net/killbill-client-net.nuspec
 *.nuspec
 mygetpush.cmd
