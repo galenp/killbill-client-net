@@ -10,7 +10,7 @@ namespace KillBill.Client.Net.Tests.ModificationTests
     public class PaymentMethodModificationTests : BaseTestFixture
     {
 
-        [TestCase("tok_154IZqC746zpV9sQ8zwrbQxU")]
+        [TestCase("tok_154JgSC746zpV9sQFB1h4ACJ")]
         public void Create_PaymentMethod_Stripe(string stripeToken)
         {
             //Given

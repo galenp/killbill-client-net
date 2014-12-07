@@ -22,6 +22,18 @@ namespace KillBill.Client.Net.Tests.SafeTests
             paymentMethod.PaymentMethodId.Should().Be(paymentMethodId);
 
         }
+
+
+        [Test]
+        public void Get_PaymentMethodsForAccount()
+        {
+            //When
+            var paymentMethods = Client.GetPaymentMethodsForAccount(AccountId);
+
+            //Then
+            paymentMethods.Should().NotBeNull();
+            paymentMethods.Should().NotBeEmpty();
+        }
          
     }
 }

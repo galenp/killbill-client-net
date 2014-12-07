@@ -110,6 +110,7 @@
     <Compile Include="Model\Accounts.cs" />
     <Compile Include="Model\AccountTimeline.cs" />
     <Compile Include="Model\AuditLog.cs" />
+    <Compile Include="Model\BillingException.cs" />
     <Compile Include="Model\Bundle.cs" />
     <Compile Include="Model\Bundles.cs" />
     <Compile Include="Model\Credit.cs" />
@@ -126,8 +127,10 @@
     <Compile Include="Model\Payment.cs" />
     <Compile Include="Model\PaymentMethod.cs" />
     <Compile Include="Model\PaymentMethodPluginDetail.cs" />
+    <Compile Include="Model\PaymentMethods.cs" />
     <Compile Include="Model\PaymentTransaction.cs" />
     <Compile Include="Model\PluginProperty.cs" />
+    <Compile Include="Model\StackTraceElement.cs" />
     <Compile Include="Model\Subscription.cs" />
     <Compile Include="JSON\RestSharpJsonNetSerializer.cs" />
     <Compile Include="Model\Tenant.cs" />

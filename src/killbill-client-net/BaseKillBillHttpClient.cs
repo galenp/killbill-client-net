@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Net;
@@ -7,6 +8,7 @@ using KillBill.Client.Net.JSON;
 using KillBill.Client.Net.Model;
 using Newtonsoft.Json;
 using RestSharp;
+using RestSharp.Deserializers;
 
 namespace KillBill.Client.Net
 {
@@ -161,15 +163,19 @@ namespace KillBill.Client.Net
             if (followLocation)
             {
                 var responseToFollow = ExecuteRequest(request);
-                
+
                 if (responseToFollow == null)
                     return default(T);
-
-                var locationHeader = responseToFollow.Headers.SingleOrDefault(h => h.Type == ParameterType.HttpHeader && h.Name == "Location");
-                if (locationHeader == null || locationHeader.Value == null || locationHeader.Value.ToString() == string.Empty)
+               
+                var locationHeader = responseToFollow.Headers.SingleOrDefault(
+                        h => h.Type == ParameterType.HttpHeader && h.Name == "Location");
+                if (locationHeader == null || locationHeader.Value == null ||
+                    locationHeader.Value.ToString() == string.Empty)
                     return default(T);
 
-                return GetWithUrl<T>(locationHeader.Value.ToString(), optionsForFollow);
+                var locationUri = new Uri(locationHeader.Value.ToString());
+
+                return GetWithUrl<T>(locationUri.PathAndQuery, optionsForFollow);
             }
 
             var response = ExecuteRequest(request);
@@ -290,8 +296,12 @@ namespace KillBill.Client.Net
         /// <returns>API response</returns>
         private IRestResponse ExecuteRequest(IRestRequest request)
         {
-            var baseUri = request.Resource.StartsWith("http") ? "" : KbConfig.ServerUrl;
-            var client = CreateClient(baseUri);            
+            var baseUri = KbConfig.ServerUrl;
+            var client = CreateClient(baseUri);
+
+            if (request.Resource.Contains("http"))
+                throw new ArgumentException("Request.Resource should be a relative Uri (/location) and not the full Url (http, domain etc)");
+            
             var response = client.Execute(request);
 
             object defaultObject;
@@ -301,10 +311,31 @@ namespace KillBill.Client.Net
         }
 
 
-        private bool CheckResponse<T>(IRestResponse response, out T defaultObject) where T : new()
+        private void CheckResponse<T>(IRestResponse response, out T defaultObject) where T : new()
         {
             if (response == null)
                 throw new KillBillClientException("Error calling KillBill: no response");
+
+            if (response.StatusCode == HttpStatusCode.Unauthorized) {
+                 throw new KillBillClientException(response.ErrorMessage, new ArgumentException("Unauthorized - did you configure your RBAC and/or tenant credentials?"));
+            }
+
+            if (response.StatusCode == HttpStatusCode.NoContent)
+            {
+                // Return empty list for KillBillObjects instead of null for convenience
+                if (typeof (T).IsAssignableFrom(typeof (KillBillObjects<>)))
+                {
+                    defaultObject = Activator.CreateInstance<T>();
+                    return;
+                }
+            }
+
+            if (response.StatusCode >= HttpStatusCode.BadRequest && response.Content != null)
+            {
+                var billingException = JsonConvert.DeserializeObject<BillingException>(response.Content, JsonNetSerializationSettings.GetDefault());
+                var message = "Error " + response.StatusCode + " from Kill Bill" + billingException.Message;
+                throw new KillBillClientException(message);
+            }
 
             if (response.ErrorException != null)
             {
@@ -313,30 +344,26 @@ namespace KillBill.Client.Net
                 throw exception;
             }
 
-            if (response.StatusCode == HttpStatusCode.Unauthorized || response.StatusCode == HttpStatusCode.NoContent)
-            {
-                // Return empty list for KillBillObjects instead of null for convenience
-                if (typeof (T).IsAssignableFrom(typeof (KillBillObjects<>)))
-                {
-                    defaultObject = Activator.CreateInstance<T>();
-                    return false;
-                }                    
-            }
-
-           
-
             defaultObject = default(T);
-            return true;
         }
 
         private RestClient CreateClient(string baseUri)
         {
+            string proxyUri = null;
+            if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["kb.api.proxy"]))
+            {
+                proxyUri = ConfigurationManager.AppSettings["kb.api.proxy"];
+            }
+
+
             return new RestClient(baseUri)
             {
                 Authenticator = ApiAuthentication(),
-                //Proxy = new WebProxy("http://localhost:8888")
+                Proxy = proxyUri == null ? new WebProxy(proxyUri) : null
             };
         }
+
+
 
 
         #region private helpers

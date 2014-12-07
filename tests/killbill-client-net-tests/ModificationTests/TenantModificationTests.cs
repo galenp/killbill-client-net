@@ -1,6 +1,5 @@
 ﻿using System;
 using FluentAssertions;
-using KillBill.Client.Net.Model;
 using NUnit.Framework;
 
 namespace KillBill.Client.Net.Tests.ModificationTests
@@ -8,11 +7,6 @@ namespace KillBill.Client.Net.Tests.ModificationTests
     [TestFixture]
     public class TenantModificationTests : BaseTestFixture
     {
-
-       
-
-
-
 
         [Test]
         public void Register_Notification_Callback()
