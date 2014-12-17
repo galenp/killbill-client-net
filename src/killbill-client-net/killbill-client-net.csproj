@@ -92,6 +92,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IKillBillClient.cs" />
     <Compile Include="Infrastructure\DateTimeExtensions.cs" />
     <Compile Include="HttpClients\HttpClientBasicAuth.cs" />
     <Compile Include="Infrastructure\RestSharpExtensions.cs" />

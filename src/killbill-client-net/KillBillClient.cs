@@ -9,7 +9,7 @@ using RestSharp.Contrib;
 
 namespace KillBill.Client.Net
 {
-    public class KillBillClient
+    public class KillBillClient : IKillBillClient
     {
         private readonly IKbHttpClient client;
         private static MultiMap<string>  DEFAULT_EMPTY_QUERY = new MultiMap<string>();
