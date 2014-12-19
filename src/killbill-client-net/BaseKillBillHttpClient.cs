@@ -330,6 +330,12 @@ namespace KillBill.Client.Net
                 }
             }
 
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                defaultObject = default(T);
+                return;
+            }
+
             if (response.StatusCode >= HttpStatusCode.BadRequest && response.Content != null)
             {
                 var billingException = JsonConvert.DeserializeObject<BillingException>(response.Content, JsonNetSerializationSettings.GetDefault());
