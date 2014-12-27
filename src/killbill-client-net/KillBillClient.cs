@@ -405,11 +405,16 @@ namespace KillBill.Client.Net
 
         }
 
-        public PaymentMethods GetPaymentMethodsForAccount(Guid accountId)  {
+        public PaymentMethods GetPaymentMethodsForAccount(Guid accountId, bool withPluginInfo = false)  {
             var uri = KbConfig.ACCOUNTS_PATH + "/" + accountId + "/" + KbConfig.PAYMENT_METHODS;
 
-            return client.Get<PaymentMethods>(uri, DEFAULT_EMPTY_QUERY);
+            var options = new MultiMap<string>();
+            options.Add(KbConfig.QUERY_WITH_PLUGIN_INFO, withPluginInfo.ToString());
+
+            return client.Get<PaymentMethods>(uri, options);
         }
+
+       
 
         public PaymentMethod CreatePaymentMethod(PaymentMethod paymentMethod, string createdBy, string reason,
             string comment)

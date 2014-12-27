@@ -65,7 +65,7 @@ namespace KillBill.Client.Net
         PaymentMethod GetPaymentMethod(Guid paymentMethodId, bool withPluginInfo = false,
             AuditLevel auditLevel = AuditLevel.NONE);
 
-        PaymentMethods GetPaymentMethodsForAccount(Guid accountId);
+        PaymentMethods GetPaymentMethodsForAccount(Guid accountId, bool withPluginInfo = false);
 
         PaymentMethod CreatePaymentMethod(PaymentMethod paymentMethod, string createdBy, string reason,
             string comment);

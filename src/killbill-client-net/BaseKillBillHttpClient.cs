@@ -24,12 +24,12 @@ namespace KillBill.Client.Net
             return SendRequest(Method.GET, uri, null, options);
         }
 
-        public T Get<T>(string uri, MultiMap<string> options) where T : new()
+        public T Get<T>(string uri, MultiMap<string> options) where T : class
         {
             return GetWithUrl<T>(uri, options);
         }
 
-        public T GetWithUrl<T>(string uri, MultiMap<string> options) where T : new()
+        public T GetWithUrl<T>(string uri, MultiMap<string> options) where T : class
         {
             return SendRequestAndMaybeFollowLocation<T>(Method.GET, uri, options);
         }
@@ -44,18 +44,18 @@ namespace KillBill.Client.Net
         }
 
         // - typed without follow
-        public T Post<T>(string uri, object body, MultiMap<string> options)  where T : new()
+        public T Post<T>(string uri, object body, MultiMap<string> options)  where T : class
         {
             return Post<T>(uri, body, options, DEFAULT_EMPTY_QUERY, false);
         }
 
         // - typed with follow
-        public T Post<T>(string uri, object body, MultiMap<string> options, MultiMap<string> optionsForFollow, bool followLocation) where T : new()
+        public T Post<T>(string uri, object body, MultiMap<string> options, MultiMap<string> optionsForFollow, bool followLocation) where T : class
         {
             return SendRequestAndMaybeFollowLocation<T>(Method.POST, uri, body, options, optionsForFollow, followLocation);
         }
 
-        public T PostAndFollow<T>(string uri, object body, MultiMap<string> options, MultiMap<string> optionsForFollow) where T : new() 
+        public T PostAndFollow<T>(string uri, object body, MultiMap<string> options, MultiMap<string> optionsForFollow) where T : class 
         {
             return SendRequestAndMaybeFollowLocation<T>(Method.POST, uri, body, options, optionsForFollow, true);
         }
@@ -69,18 +69,18 @@ namespace KillBill.Client.Net
         }
 
         // - typed without follow
-        public T Put<T>(string uri, object body, MultiMap<string> options) where T : new()
+        public T Put<T>(string uri, object body, MultiMap<string> options) where T : class
         {
             return Put<T>(uri, body, options, DEFAULT_EMPTY_QUERY, false);
         }
 
         // - typed with follow
-        public T Put<T>(string uri, object body, MultiMap<string> options, MultiMap<string> optionsForFollow, bool followLocation) where T : new()
+        public T Put<T>(string uri, object body, MultiMap<string> options, MultiMap<string> optionsForFollow, bool followLocation) where T : class
         {
             return SendRequestAndMaybeFollowLocation<T>(Method.PUT, uri, body, options, optionsForFollow, followLocation);
         }
 
-        public T PutAndFollow<T>(string uri, object body, MultiMap<string> options, MultiMap<string> optionsForFollow) where T : new()
+        public T PutAndFollow<T>(string uri, object body, MultiMap<string> options, MultiMap<string> optionsForFollow) where T : class
         {
             return SendRequestAndMaybeFollowLocation<T>(Method.PUT, uri, body, options, optionsForFollow, true);
         }
@@ -100,18 +100,18 @@ namespace KillBill.Client.Net
         }
 
         // - typed without follow
-        public T Delete<T>(string uri, object body, MultiMap<string> options) where T : new()
+        public T Delete<T>(string uri, object body, MultiMap<string> options) where T : class
         {
             return Delete<T>(uri, body, options, DEFAULT_EMPTY_QUERY, false);
         }
 
         // - typed with follow
-        public T Delete<T>(string uri, object body, MultiMap<string> options, MultiMap<string> optionsForFollow, bool followLocation) where T : new()
+        public T Delete<T>(string uri, object body, MultiMap<string> options, MultiMap<string> optionsForFollow, bool followLocation) where T : class
         {
             return SendRequestAndMaybeFollowLocation<T>(Method.DELETE, uri, body, options, optionsForFollow, followLocation);
         }
 
-        public T DeleteAndFollow<T>(string uri, object body, MultiMap<string> options, MultiMap<string> optionsForFollow) where T : new()
+        public T DeleteAndFollow<T>(string uri, object body, MultiMap<string> options, MultiMap<string> optionsForFollow) where T : class
         {
             return SendRequestAndMaybeFollowLocation<T>(Method.DELETE, uri, body, options, optionsForFollow, true);
         }
@@ -119,7 +119,7 @@ namespace KillBill.Client.Net
 
         // COMMON
         //-------------------------------------------------------------------------------
-        private T SendRequestAndMaybeFollowLocation<T>(Method method, string uri, MultiMap<string> options) where T : new()
+        private T SendRequestAndMaybeFollowLocation<T>(Method method, string uri, MultiMap<string> options) where T : class
         {
             return SendRequestAndMaybeFollowLocation<T>(method, uri, null, options, DEFAULT_EMPTY_QUERY, false);
         }
@@ -141,7 +141,7 @@ namespace KillBill.Client.Net
             return ExecuteRequest(request);
         }
 
-        private T SendRequestAndMaybeFollowLocation<T>(Method method, string uri, object body, MultiMap<string> options, MultiMap<string> optionsForFollow, bool followLocation) where T : new()
+        private T SendRequestAndMaybeFollowLocation<T>(Method method, string uri, object body, MultiMap<string> options, MultiMap<string> optionsForFollow, bool followLocation) where T : class
         {
             
             var request = BuildRequestWithHeaderAndQuery(method, uri, options);
@@ -179,6 +179,14 @@ namespace KillBill.Client.Net
             }
 
             var response = ExecuteRequest(request);
+
+            //If there is no response (204) or if an object cannot be found (404), the code will return null (for single objects) or an empty list (for collections of objects).
+            if (response.StatusCode == HttpStatusCode.NoContent || response.StatusCode == HttpStatusCode.NotFound)
+            {
+                // Return empty list for KillBillObjects instead of null for convenience
+                return typeof(T).IsAssignableFrom(typeof(KillBillObjects<>)) ? Activator.CreateInstance<T>() : default(T);
+            }
+
             var data = DeserializeResponse<T>(response);
             return data;
         }
@@ -272,7 +280,7 @@ namespace KillBill.Client.Net
         /// <typeparam name="T">RESPONSE type to deserialize.</typeparam>
         /// <param name="request">Request</param>
         /// <returns>Deserialized T from response.</returns>
-        //private IRestResponse<T> ExecuteRequest<T>(IRestRequest request) where T : new()
+        //private IRestResponse<T> ExecuteRequest<T>(IRestRequest request) where T : class
         //{
         //    var baseUri = request.Resource.StartsWith("http") ? "" : KbConfig.ServerUrl;
         //    var client = CreateClient(baseUri);
@@ -311,7 +319,7 @@ namespace KillBill.Client.Net
         }
 
 
-        private void CheckResponse<T>(IRestResponse response, out T defaultObject) where T : new()
+        private void CheckResponse<T>(IRestResponse response, out T defaultObject) where T : class
         {
             if (response == null)
                 throw new KillBillClientException("Error calling KillBill: no response");
@@ -320,7 +328,7 @@ namespace KillBill.Client.Net
                  throw new KillBillClientException(response.ErrorMessage, new ArgumentException("Unauthorized - did you configure your RBAC and/or tenant credentials?"));
             }
 
-            if (response.StatusCode == HttpStatusCode.NoContent)
+            if (response.StatusCode == HttpStatusCode.NoContent || response.StatusCode == HttpStatusCode.NotFound)
             {
                 // Return empty list for KillBillObjects instead of null for convenience
                 if (typeof (T).IsAssignableFrom(typeof (KillBillObjects<>)))
@@ -328,10 +336,7 @@ namespace KillBill.Client.Net
                     defaultObject = Activator.CreateInstance<T>();
                     return;
                 }
-            }
 
-            if (response.StatusCode == HttpStatusCode.NotFound)
-            {
                 defaultObject = default(T);
                 return;
             }
@@ -339,8 +344,8 @@ namespace KillBill.Client.Net
             if (response.StatusCode >= HttpStatusCode.BadRequest && response.Content != null)
             {
                 var billingException = JsonConvert.DeserializeObject<BillingException>(response.Content, JsonNetSerializationSettings.GetDefault());
-                var message = "Error " + response.StatusCode + " from Kill Bill" + billingException.Message;
-                throw new KillBillClientException(message);
+                var message = "Error " + response.StatusCode + " from Kill Bill " + billingException.Message;
+                throw new KillBillClientException(message, response.StatusCode.ToString(), billingException.Code, billingException.Message);
             }
 
             if (response.ErrorException != null)
