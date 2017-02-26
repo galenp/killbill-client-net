@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System;
+using FluentAssertions;
 using NUnit.Framework;
 
 namespace KillBill.Client.Net.Tests.SafeTests
@@ -73,6 +74,34 @@ namespace KillBill.Client.Net.Tests.SafeTests
             //Then
             emails.Should().NotBeNull();
             emails.Should().NotBeEmpty();
+        }
+
+        [Test]
+        [TestCase("e30c32c3-fdba-4ce5-98bb-a9b284ee7eb1")]
+        public void Get_Payments_For_Account(string accountIdString)
+        {
+            //Given
+            var accountId = new Guid(accountIdString);
+
+            //When
+            var payments = Client.GetPaymentsForAccount(accountId);
+
+            //Then
+            payments.Should().NotBeNullOrEmpty();
+        }
+
+        [Test]
+        [TestCase("e30c32c3-fdba-4ce5-98bb-a9b284ee7eb1")]
+        public void Get_InvoicePayments_For_Account(string accountIdString)
+        {
+            //Given
+            var accountId = new Guid(accountIdString);
+
+            //When
+            var invoicePayments = Client.GetInvoicePaymentsForAccount(accountId);
+
+            //Then
+            invoicePayments.Should().NotBeNullOrEmpty();
         }
         
     }

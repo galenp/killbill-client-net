@@ -60,6 +60,22 @@ namespace KillBill.Client.Net
             return client.Put<Account>(uri, account, options);
         }
 
+        public InvoicePayments GetInvoicePaymentsForAccount(Guid accountId, AuditLevel auditLevel = DEFAULT_AUDIT_LEVEL)
+        {
+            var uri = KbConfig.ACCOUNTS_PATH + "/" + accountId + "/" + KbConfig.INVOICE_PAYMENTS;
+            var queryparams = new MultiMap<string>();
+            queryparams.Add(KbConfig.QUERY_SEARCH_LIMIT, auditLevel.ToString());
+            return client.Get<InvoicePayments>(uri, queryparams);
+        }
+
+        public Payments GetPaymentsForAccount(Guid accountId, AuditLevel auditLevel = DEFAULT_AUDIT_LEVEL)
+        {
+            var uri = KbConfig.ACCOUNTS_PATH + "/" + accountId + "/" + KbConfig.PAYMENTS;
+            var queryparams = new MultiMap<string>();
+            queryparams.Add(KbConfig.QUERY_SEARCH_LIMIT, auditLevel.ToString());
+            return client.Get<Payments>(uri, queryparams);
+        }
+
         //ACCOUNTS
         //-------------------------------------------------------------------------------------------------------------------------------------
         public Accounts GetAccounts(long offset = 0L, long limit = 100L, AuditLevel auditLevel = DEFAULT_AUDIT_LEVEL)
@@ -389,6 +405,7 @@ namespace KillBill.Client.Net
             return client.PostAndFollow<Payment>(uri, paymentTransaction, queryParams, DEFAULT_EMPTY_QUERY);
 
         }
+
 
         //PAYMENT METHODS
         //-------------------------------------------------------------------------------------------------------------------------------------

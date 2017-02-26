@@ -121,6 +121,8 @@
     <Compile Include="Model\Invoice.cs" />
     <Compile Include="Model\InvoiceEmail.cs" />
     <Compile Include="Model\InvoiceItem.cs" />
+    <Compile Include="Model\InvoicePayment.cs" />
+    <Compile Include="Model\InvoicePayments.cs" />
     <Compile Include="Model\Invoices.cs" />
     <Compile Include="Model\KillBillObject.cs" />
     <Compile Include="Model\KillBillObjects.cs" />
@@ -129,6 +131,7 @@
     <Compile Include="Model\PaymentMethod.cs" />
     <Compile Include="Model\PaymentMethodPluginDetail.cs" />
     <Compile Include="Model\PaymentMethods.cs" />
+    <Compile Include="Model\Payments.cs" />
     <Compile Include="Model\PaymentTransaction.cs" />
     <Compile Include="Model\PluginProperty.cs" />
     <Compile Include="Model\StackTraceElement.cs" />
