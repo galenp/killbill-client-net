@@ -45,8 +45,8 @@ task UpdateVersion {
 }
 
 task CreateNuGetPackage -depends Compile {
-	$vSplit = $version.Split('.')
-	if($vSplit.Length -ne 4)
+	$vSplit = $buildNumber.Split('.')
+	if($vSplit.Length -ne 3)
 	{
 		throw "Version number is invalid. Must be in the form of 0.0.0.0"
 	}

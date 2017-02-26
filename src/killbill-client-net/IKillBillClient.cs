@@ -11,6 +11,8 @@ namespace KillBill.Client.Net
         Account CreateAccount(Account account, string createdBy, string reason, string comment, IDictionary<string, string> additionalHeaders = null);
         Account UpdateAccount(Account account, string createdBy, string reason, string comment, IDictionary<string, string> additionalHeaders = null);
         Accounts GetAccounts(long offset = 0L, long limit = 100L, AuditLevel auditLevel = AuditLevel.NONE);
+        Payments GetPaymentsForAccount(Guid accountId, AuditLevel auditLevel = AuditLevel.NONE);
+        InvoicePayments GetInvoicePaymentsForAccount(Guid accountId, AuditLevel auditLevel = AuditLevel.NONE);
         void AddEmailToAccount(AccountEmail email, string createdBy, string reason, string comment);
         void RemoveEmailFromAccount(AccountEmail email, string createdBy, string reason, string comment);
         AccountEmails GetEmailsForAccount(Guid accountId);
