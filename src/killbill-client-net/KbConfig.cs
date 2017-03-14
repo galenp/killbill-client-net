@@ -84,6 +84,7 @@ namespace KillBill.Client.Net
         public const string QUERY_CALL_TIMEOUT = "callTimeoutSec";
         public const string QUERY_CUSTOM_FIELDS = "customFieldList";
         public const string QUERY_DELETE_DEFAULT_PM_WITH_AUTO_PAY_OFF = "deleteDefaultPmWithAutoPayOff";
+        public const string QUERY_FORCE_DEFAULT_PM_DELETION = "forceDefaultPmDeletion";
         public const string QUERY_DRY_RUN = "dryRun";
         public const string QUERY_ENTITLEMENT_POLICY = "entitlementPolicy";
         public const string QUERY_EXTERNAL_KEY = "externalKey";

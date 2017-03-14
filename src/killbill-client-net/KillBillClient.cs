@@ -448,7 +448,18 @@ namespace KillBill.Client.Net
 
         }
 
-        //TENANT
+        public void DeletePaymentMethod(Guid paymentMethodId, bool deleteDefault, string createdBy, string reason, string comment,  bool forceDelete = false, bool forceDeleteDefault = false)
+        {
+            var uri = KbConfig.PAYMENT_METHODS_PATH + "/" + paymentMethodId;
+            var options = new MultiMap<string>();
+            options.Add(KbConfig.QUERY_DELETE_DEFAULT_PM_WITH_AUTO_PAY_OFF, deleteDefault.ToString());
+            options.Add(KbConfig.QUERY_FORCE_DEFAULT_PM_DELETION, forceDeleteDefault.ToString());
+            var queryparams = ParamsWithAudit(options, createdBy, reason, comment);
+            client.Delete(uri, queryparams);
+        }
+
+
+        //TENANT    
         //-------------------------------------------------------------------------------------------------------------------------------------
         public Tenant CreateTenant(Tenant tenant, string createdBy, string reason, string comment)
         {

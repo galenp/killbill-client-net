@@ -72,6 +72,8 @@ namespace KillBill.Client.Net
         PaymentMethod CreatePaymentMethod(PaymentMethod paymentMethod, string createdBy, string reason,
             string comment);
 
+        void DeletePaymentMethod(Guid paymentMethodId, bool deleteDefault, string createdBy, string reason, string comment, bool forceDelete = false, bool forceDeleteDefault = false);
+
         Tenant CreateTenant(Tenant tenant, string createdBy, string reason, string comment);
 
         void DeleteCallbackNotificationForTenanr(Guid tenantId, string createdBy, string reason,
