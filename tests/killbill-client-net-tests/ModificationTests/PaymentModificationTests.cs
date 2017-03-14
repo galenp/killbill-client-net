@@ -24,7 +24,7 @@ namespace KillBill.Client.Net.Tests.ModificationTests
 
             };
             //When
-            var payment = Client.CreatePayment(AccountId, paymentMethodId, paymentTransaction, CreatedBy, Reason, "PaymentModificationTests:Create_Payment");
+            var payment = Client.CreatePayment(AccountId, paymentMethodId, paymentTransaction, Options);
 
 
             //Then

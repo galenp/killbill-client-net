@@ -5,6 +5,8 @@ namespace KillBill.Client.Net
     public static class KbConfig
     {
         public static string ServerUrl = "http://127.0.0.1:8080";
+        public static string HttpUser = "bob";
+        public static string HttpPassword = "lazor";
         public static string ApiKey = "admin";
         public static string ApiSecret = "password";
 
@@ -17,9 +19,10 @@ namespace KillBill.Client.Net
         public static string AUDIT_OPTION_COMMENT = "__AUDIT_OPTION_COMMENT";
         public static string TENANT_OPTION_API_KEY = "__TENANT_OPTION_API_KEY";
         public static string TENANT_OPTION_API_SECRET = "__TENANT_OPTION_API_SECRET";
-
+        public static string CONTROL_PLUGIN_NAME = "controlPluginName";
 
         public static string PREFIX = API_PREFIX + API_VERSION + API_POSTFIX;
+        public static int DEFAULT_HTTP_TIMEOUT_SEC = 10;
         /*
          * Resource paths
         */
@@ -78,6 +81,7 @@ namespace KillBill.Client.Net
         public const string QUERY_ACCOUNT_ID = "accountId";
         public const string QUERY_ACCOUNT_WITH_BALANCE = "accountWithBalance";
         public const string QUERY_ACCOUNT_WITH_BALANCE_AND_CBA = "accountWithBalanceAndCBA";
+        public const string QUERY_ACCOUNT_TREAT_NULL_AS_RESET = "treatNullAsReset";
         public const string QUERY_AUDIT = "audit";
         public const string QUERY_BILLING_POLICY = "billingPolicy";
         public const string QUERY_CALL_COMPLETION = "callCompletion";
@@ -89,21 +93,27 @@ namespace KillBill.Client.Net
         public const string QUERY_ENTITLEMENT_POLICY = "entitlementPolicy";
         public const string QUERY_EXTERNAL_KEY = "externalKey";
         public const string QUERY_INVOICE_WITH_ITEMS = "withItems";
+        public const string QUERY_INVOICE_WITH_CHILDREN_ITEMS = "withChildrenItems";
         public const string QUERY_NOTIFICATION_CALLBACK = "cb";
         public const string QUERY_PAYMENT_EXTERNAL = "externalPayment";
         public const string QUERY_PAYMENT_METHOD_IS_DEFAULT = "isDefault";
         public const string QUERY_PAYMENT_PLUGIN_NAME = "pluginName";
         public const string QUERY_PAY_INVOICE = "payInvoice";
+        public const string QUERY_AUTO_COMMIT = "autoCommit";
         public const string QUERY_PLUGIN_PROPERTY = "pluginProperty";
         public const string QUERY_REQUESTED_DT = "requestedDate";
+        public const string QUERY_PAYMENT_EXT_KEY = "paymentExternalKey";
+        public const string QUERY_TRANSACTION_EXT_KEY = "transactionExternalKey";
         public const string QUERY_SEARCH_LIMIT = "limit";
         public const string QUERY_SEARCH_OFFSET = "offset";
         public const string QUERY_TAGS = "tagList";
         public const string QUERY_TARGET_DATE = "targetDate";
         public const string QUERY_UNPAID_INVOICES_ONLY = "unpaidInvoicesOnly";
+        public const string QUERY_WITH_MIGRATION_INVOICES = "withMigrationInvoices";
         public const string QUERY_PAYMENT_METHOD_PLUGIN_NAME = "pluginName";
         public const string QUERY_WITH_PLUGIN_INFO = "withPluginInfo";
-
+        public const string QUERY_TENANT_USE_GLOBAL_DEFAULT = "useGlobalDefault";
+        public const string QUERY_MIGRATED = "migrated";
        /*
         * Metadata Additional headers
         */
@@ -121,6 +131,8 @@ namespace KillBill.Client.Net
             ServerUrl = ConfigurationManager.AppSettings["kb.api.url"] ?? ServerUrl;
             ApiKey = ConfigurationManager.AppSettings["kb.api.key"] ?? ApiKey;
             ApiSecret = ConfigurationManager.AppSettings["kb.api.secret"] ?? ApiSecret;
+            HttpPassword = ConfigurationManager.AppSettings["kb.http.password"] ?? HttpPassword;
+            HttpUser = ConfigurationManager.AppSettings["kb.http.user"] ?? HttpUser;
         }
     }
 }

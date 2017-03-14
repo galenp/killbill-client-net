@@ -26,7 +26,7 @@ namespace KillBill.Client.Net.Tests.ModificationTests
             };
 
             //When
-            var bundle = Client.CreateSubscription(subscription, CreatedBy, Reason, "SubscriptionModificationTests:Create_Subscription()");
+            var bundle = Client.CreateSubscription(subscription, Options);
 
             //Then
             bundle.Should().NotBeNull();
@@ -40,7 +40,7 @@ namespace KillBill.Client.Net.Tests.ModificationTests
         public void Add_Subscription_To_Bundle()
         {
             //Given
-            var existingBundle = Client.GetBundle(externalKey);
+            var existingBundle = Client.GetBundle(externalKey, Options);
             existingBundle.Should().NotBeNull("We can't add a second subscription if the bundle doesnt exist... run the above test first.");
 
             var subscription = new Subscription
@@ -56,7 +56,7 @@ namespace KillBill.Client.Net.Tests.ModificationTests
             };
 
             //When
-            var secondSubcription = Client.CreateSubscription(subscription, CreatedBy, Reason, "SubscriptionModificationTests:Add_Subscription_To_Bundle()");
+            var secondSubcription = Client.CreateSubscription(subscription, Options);
 
             //Then
             secondSubcription.Should().NotBeNull();

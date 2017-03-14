@@ -15,7 +15,7 @@ namespace KillBill.Client.Net.Tests.ModificationTests
             var callback = "http://192.165.56.1:8080/notsurewhatiexpecttosee";
 
             //When
-            var tenantKey = Client.RegisterCallBackNotificationForTenant(callback, CreatedBy, Reason, "TenantModificationTests:Register_Notification_Callback");
+            var tenantKey = Client.RegisterCallBackNotificationForTenant(callback, Options);
 
             //Then
             tenantKey.Should().NotBeNull();
@@ -23,20 +23,20 @@ namespace KillBill.Client.Net.Tests.ModificationTests
 
 
         [TestCase("d632f46a-15cf-409a-83c1-34390b983a12")]
-        public void Delete_Notification_Callback(string tenantIdString)
+        public void Unregister_Notification_Callback(string tenantIdString)
         {
             //Given
             var tenantId = Guid.Parse(tenantIdString);
 
             //When
-            Client.DeleteCallbackNotificationForTenanr(tenantId, CreatedBy, Reason, "TenantModificationTests:Delete_Notification_Callback");
+            Client.UnregisterCallbackNotificationForTenant(tenantId, Options);
         }
 
         [Test]
         public void Retrieve_Notification_Callbacks()
         {
             //When
-            var tenantKey = Client.RetrieveRegisteredCallBacks();
+            var tenantKey = Client.GetCallbackNotificationForTenant(Options);
 
             //Then
             tenantKey.Should().NotBeNull("Because in the above test we registered a new one");

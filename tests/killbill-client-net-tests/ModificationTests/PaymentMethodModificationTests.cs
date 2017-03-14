@@ -32,7 +32,7 @@ namespace KillBill.Client.Net.Tests.ModificationTests
             };
 
             //When
-            var paymentMethod = Client.CreatePaymentMethod(stripePaymentMethod, CreatedBy, Reason, "PaymentMethodModificationTests:Create_PaymentMethod_Stripe");
+            var paymentMethod = Client.CreatePaymentMethod(stripePaymentMethod, Options);
 
             //Then
             paymentMethod.Should().NotBeNull();

@@ -14,7 +14,7 @@ namespace KillBill.Client.Net.Tests.SafeTests
               var subscriptionId = Guid.Parse(strId);
 
               //When
-              var subscription = Client.GetSubscription(subscriptionId);
+              var subscription = Client.GetSubscription(subscriptionId, Options);
 
               //Then
               subscription.Should().NotBeNull();

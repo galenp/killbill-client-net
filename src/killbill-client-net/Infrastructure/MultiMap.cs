@@ -4,8 +4,14 @@ namespace KillBill.Client.Net.Infrastructure
 {
     public class MultiMap<TV>
     {
-        readonly Dictionary<string, List<TV>> dictionary =
-        new Dictionary<string, List<TV>>();
+        public MultiMap<TV> Create(MultiMap<TV> from)
+        {
+            this.dictionary = from.Dictionary;
+            return this;
+        }
+
+        private Dictionary<string, List<TV>> dictionary = new Dictionary<string, List<TV>>();
+        public Dictionary<string, List<TV>> Dictionary => dictionary;
 
         public void Add(string key, TV value)
         {
@@ -30,23 +36,16 @@ namespace KillBill.Client.Net.Infrastructure
             dictionary.Remove(key);
         }
 
-        public IEnumerable<string> Keys
-        {
-            get
-            {
-                return dictionary.Keys;
-            }
-        }
+        public IEnumerable<string> Keys => dictionary.Keys;
         
         public List<TV> this[string key]
         {
             get
             {
-                List<TV> list;
-                
-                if (dictionary.TryGetValue(key, out list)) 
+
+                if (dictionary.TryGetValue(key, out List<TV> list))
                     return list;
-                
+
                 list = new List<TV>();
                 dictionary[key] = list;
                 return list;
@@ -61,6 +60,11 @@ namespace KillBill.Client.Net.Infrastructure
             }
         }
 
-       
+        public void PutAll(string key, List<TV> queryParams)
+        {
+            foreach (var value in queryParams) {
+                Add(key, value);
+            }
+        }
     }
 }

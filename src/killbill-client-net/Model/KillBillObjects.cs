@@ -17,12 +17,13 @@ namespace KillBill.Client.Net.Model
 
         public IKbHttpClient KillBillHttpClient { get; set; }
 
-        public KillBillObjects<T> GetNext()
+        //TODO: revisit this once the java client is updated to use requestOptions
+        public KillBillObjects<T> GetNext(RequestOptions requestOptions)
         {
             if (KillBillHttpClient == null || PaginationNextPageUri == null)
                 return null;
 
-            return KillBillHttpClient.Get<KillBillObjects<T>>(PaginationNextPageUri, new MultiMap<string>());
+            return KillBillHttpClient.Get<KillBillObjects<T>>(PaginationNextPageUri, requestOptions);
         }
     }
 

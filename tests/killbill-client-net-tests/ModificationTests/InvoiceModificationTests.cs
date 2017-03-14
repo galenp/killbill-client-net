@@ -37,7 +37,7 @@ namespace KillBill.Client.Net.Tests.ModificationTests
             };
 
             //When
-            var invoiceItems = Client.CreateExternalCharge(externalCharges, DateTime.Now, false, "Testing User", "api tests", "InvoiceCreationTests:Create_External_Charge");
+            var invoiceItems = Client.CreateExternalCharges(externalCharges, DateTime.Now, false, false, Options);
 
             //Then
             invoiceItems.Should().NotBeNull();

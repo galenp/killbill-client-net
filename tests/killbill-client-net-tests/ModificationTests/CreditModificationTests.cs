@@ -18,8 +18,9 @@ namespace KillBill.Client.Net.Tests.ModificationTests
                 CreditAmount = Random.Next(100, 200)
             };
 
+
             //When
-            var processed = Client.CreateCredit(credit, CreatedBy, Reason, "CreditCreationTests:Add_Credit_To_Account");
+            var processed = Client.CreateCredit(credit, true, Options);
 
             //Then
             processed.Should().NotBeNull();

@@ -15,7 +15,7 @@ namespace KillBill.Client.Net.Tests.SafeTests
             var paymentMethodId = Guid.Parse(paymentMethodString);
             
             //When
-            var paymentMethod = Client.GetPaymentMethod(paymentMethodId);
+            var paymentMethod = Client.GetPaymentMethod(paymentMethodId, Options);
             
             //Then
             paymentMethod.Should().NotBeNull();
@@ -28,7 +28,7 @@ namespace KillBill.Client.Net.Tests.SafeTests
         public void Get_PaymentMethodsForAccount()
         {
             //When
-            var paymentMethods = Client.GetPaymentMethodsForAccount(AccountId);
+            var paymentMethods = Client.GetPaymentMethodsForAccount(AccountId, Options);
 
             //Then
             paymentMethods.Should().NotBeNull();

@@ -26,7 +26,7 @@ namespace KillBill.Client.Net.Tests._SetUp
             };
 
             //When
-            var newTenant = Client.CreateTenant(tenant, CreatedBy, Reason, "NewEnvironmentTests:Create_Tenant");
+            var newTenant = Client.CreateTenant(tenant, Options);
 
             //Then
             newTenant.Should().NotBeNull();
@@ -56,7 +56,7 @@ namespace KillBill.Client.Net.Tests._SetUp
             };
 
             //When
-            var createdAccount = Client.CreateAccount(account, CreatedBy, Reason, "NewEnvironmentTests:Create_Account");
+            var createdAccount = Client.CreateAccount(account, Options);
 
             //Then
             createdAccount.Should().NotBeNull();

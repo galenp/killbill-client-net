@@ -6,7 +6,6 @@ namespace KillBill.Client.Net.Tests.SafeTests
     [TestFixture]
     public class PaginationTests : BaseTestFixture
     {
-
         [Test]
         public void Next_Uri_Link_Is_Correct()
         {
@@ -15,7 +14,7 @@ namespace KillBill.Client.Net.Tests.SafeTests
             const int offset = 0;
 
             //When
-            var accounts = Client.GetAccounts(offset, limit);
+            var accounts = Client.GetAccounts(Options);
 
             //Then
             accounts.Should().NotBeNull("Because even in empty situations we return a blank Accounts object");
@@ -23,7 +22,7 @@ namespace KillBill.Client.Net.Tests.SafeTests
             accounts.PaginationMaxNbRecords.Should().BeGreaterThan(1, "Because we should have more than 1 account as test data");
             accounts.PaginationNextPageUri.Should().NotBeEmpty("Because with a limit of 1 there should be more data to trigger paging");
 
-            var secondPage = accounts.GetNext();
+            var secondPage = accounts.GetNext(Options);
             secondPage.Should().NotBeNull();
         }
     }

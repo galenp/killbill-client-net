@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using KillBill.Client.Net.Infrastructure;
@@ -12,149 +11,200 @@ namespace KillBill.Client.Net
     public class KillBillClient : IKillBillClient
     {
         private readonly IKbHttpClient client;
-        private static MultiMap<string>  DEFAULT_EMPTY_QUERY = new MultiMap<string>();
-        private const AuditLevel DEFAULT_AUDIT_LEVEL = AuditLevel.NONE;
-        
-       
+        private const AuditLevel DefaultAuditLevel = AuditLevel.NONE;
 
         public KillBillClient(IKbHttpClient client)
         {
             this.client = client;
         }
 
-        //ACCOUNT
-        //-------------------------------------------------------------------------------------------------------------------------------------
-
-        public Account GetAccount(Guid accountId, bool withBalance = false, bool withCba = false)
+        public RequestOptions BaseOptions(string requestId, string createdBy, string reason = null, string comment = null)
         {
-            var uri = KbConfig.ACCOUNTS_PATH + "/" + accountId;
-
-            var queryParams = new MultiMap<string>();
-            queryParams.Add(KbConfig.QUERY_ACCOUNT_WITH_BALANCE, withBalance ? "true" : "false");
-            queryParams.Add(KbConfig.QUERY_ACCOUNT_WITH_BALANCE_AND_CBA, withCba ? "true" : "false");
-
-            return client.Get<Account>(uri, queryParams);
-        }
-        public Account GetAccount(string externalKey, bool withBalance = false, bool withCba = false)
-        {
-            var uri = KbConfig.ACCOUNTS_PATH;
-
-            var queryParams = new MultiMap<string>();
-            queryParams.Add(KbConfig.QUERY_EXTERNAL_KEY, externalKey);
-            queryParams.Add(KbConfig.QUERY_ACCOUNT_WITH_BALANCE, withBalance ? "true" : "false");
-            queryParams.Add(KbConfig.QUERY_ACCOUNT_WITH_BALANCE_AND_CBA, withCba ? "true" : "false");
-            
-            return client.Get<Account>(uri, queryParams);
+            return RequestOptions.Builder()
+                                    .WithRequestId(Guid.NewGuid().ToString())
+                                    .WithCreatedBy(createdBy)
+                                    .WithReason(reason)
+                                    .WithUser(KbConfig.HttpUser)
+                                    .WithPassword(KbConfig.HttpPassword)
+                                    .WithTenantApiKey(KbConfig.ApiKey)
+                                    .WithTenantApiSecret(KbConfig.ApiSecret)
+                                    .WithComment(comment)
+                                    .Build();
         }
 
-        public Account CreateAccount(Account account, string createdBy, string reason, string comment, IDictionary<string, string> additionalHeaders = null)
-        {
-            var options = ParamsWithAudit(createdBy, reason, comment);
-            return client.PostAndFollow<Account>(KbConfig.ACCOUNTS_PATH, account, options, DEFAULT_EMPTY_QUERY);
-        }
-
-        public Account UpdateAccount(Account account, string createdBy, string reason, string comment, IDictionary<string, string> additionalHeaders = null)
-        {
-            var uri = KbConfig.ACCOUNTS_PATH + "/" + account.AccountId;
-            var options = ParamsWithAudit(createdBy, reason, comment);
-            return client.Put<Account>(uri, account, options);
-        }
-
-        public InvoicePayments GetInvoicePaymentsForAccount(Guid accountId, AuditLevel auditLevel = DEFAULT_AUDIT_LEVEL)
-        {
-            var uri = KbConfig.ACCOUNTS_PATH + "/" + accountId + "/" + KbConfig.INVOICE_PAYMENTS;
-            var queryparams = new MultiMap<string>();
-            queryparams.Add(KbConfig.QUERY_SEARCH_LIMIT, auditLevel.ToString());
-            return client.Get<InvoicePayments>(uri, queryparams);
-        }
-
-        public Payments GetPaymentsForAccount(Guid accountId, AuditLevel auditLevel = DEFAULT_AUDIT_LEVEL)
-        {
-            var uri = KbConfig.ACCOUNTS_PATH + "/" + accountId + "/" + KbConfig.PAYMENTS;
-            var queryparams = new MultiMap<string>();
-            queryparams.Add(KbConfig.QUERY_SEARCH_LIMIT, auditLevel.ToString());
-            return client.Get<Payments>(uri, queryparams);
-        }
-
+        #region ACCOUNTS
         //ACCOUNTS
         //-------------------------------------------------------------------------------------------------------------------------------------
-        public Accounts GetAccounts(long offset = 0L, long limit = 100L, AuditLevel auditLevel = DEFAULT_AUDIT_LEVEL)
+        public Accounts GetAccounts(RequestOptions inputOptions)
+        {
+            return GetAccounts(0L, 100L, inputOptions);
+        }
+
+
+        public Accounts GetAccounts(long offset, long limit, RequestOptions inputOptions, AuditLevel auditLevel = AuditLevel.NONE)
         {
             var uri = KbConfig.ACCOUNTS_PATH + "/" + KbConfig.PAGINATION;
 
-            var queryparams = new MultiMap<string>();
-            queryparams.Add(KbConfig.QUERY_SEARCH_OFFSET, offset.ToString());
-            queryparams.Add(KbConfig.QUERY_SEARCH_LIMIT, limit.ToString());
-            queryparams.Add(KbConfig.QUERY_SEARCH_LIMIT, auditLevel.ToString());
-            return client.Get<Accounts>(uri, queryparams);
+            var queryParams = new MultiMap<string>().Create(inputOptions.QueryParams);
+            queryParams.Add(KbConfig.QUERY_SEARCH_OFFSET, offset.ToString());
+            queryParams.Add(KbConfig.QUERY_SEARCH_LIMIT, limit.ToString());
+            queryParams.Add(KbConfig.QUERY_AUDIT, auditLevel.ToString());
+
+            var requestOptions = inputOptions.Extend().WithQueryParams(queryParams).Build();
+
+            return client.Get<Accounts>(uri, requestOptions);
         }
+        #endregion
+
+        #region ACCOUNT
+        //ACCOUNT
+        //-------------------------------------------------------------------------------------------------------------------------------------
+        public Account GetAccount(Guid accountId, RequestOptions inputOptions, bool withBalance = false, bool withCba = false)
+        {
+            var uri = KbConfig.ACCOUNTS_PATH + "/" + accountId;
+
+            var queryParams = new MultiMap<string>().Create(inputOptions.QueryParams);
+            queryParams.Add(KbConfig.QUERY_ACCOUNT_WITH_BALANCE, withBalance ? "true" : "false");
+            queryParams.Add(KbConfig.QUERY_ACCOUNT_WITH_BALANCE_AND_CBA, withCba ? "true" : "false");
+
+            var requestOptions = inputOptions.Extend().WithQueryParams(queryParams).Build();
+            return client.Get<Account>(uri, requestOptions);
+        }
+
+        public Account GetAccount(string externalKey, RequestOptions inputOptions, bool withBalance = false, bool withCba = false)
+        {
+            var uri = KbConfig.ACCOUNTS_PATH;
+            var queryParams = new MultiMap<string>().Create(inputOptions.QueryParams);
+            queryParams.Add(KbConfig.QUERY_EXTERNAL_KEY, externalKey);
+            queryParams.Add(KbConfig.QUERY_ACCOUNT_WITH_BALANCE, withBalance ? "true" : "false");
+            queryParams.Add(KbConfig.QUERY_ACCOUNT_WITH_BALANCE_AND_CBA, withCba ? "true" : "false");
+            var requestOptions = inputOptions.Extend().WithQueryParams(queryParams).Build();
+            return client.Get<Account>(uri, requestOptions);
+        }
+
+        public Account CreateAccount(Account account, RequestOptions inputOptions)
+        {
+            var followLocation = inputOptions.FollowLocation ?? true;
+            var requestOptions = inputOptions.Extend().WithFollowLocation(followLocation).Build();
+            return client.Post<Account>(KbConfig.ACCOUNTS_PATH, account, requestOptions);
+        }
+
+        public Account UpdateAccount(Account account, RequestOptions inputOptions)
+        {
+            return UpdateAccount(account, false, inputOptions);
+        }
+
+        public Account UpdateAccount(Account account, bool treatNullAsReset, RequestOptions inputOptions)
+        {
+            var uri = KbConfig.ACCOUNTS_PATH + "/" + account.AccountId;
+            var queryParams = new MultiMap<string>().Create(inputOptions.QueryParams);
+            queryParams.Add(KbConfig.QUERY_ACCOUNT_TREAT_NULL_AS_RESET, treatNullAsReset ? "true" : "false");
+            var requestOptions = inputOptions.Extend().WithQueryParams(queryParams).Build();
+            return client.Put<Account>(uri, account, requestOptions);
+        }
+
+
+        public InvoicePayments GetInvoicePaymentsForAccount(Guid accountId, RequestOptions inputOptions, AuditLevel auditLevel = DefaultAuditLevel)
+        {
+            var uri = KbConfig.ACCOUNTS_PATH + "/" + accountId + "/" + KbConfig.INVOICE_PAYMENTS;
+
+            var queryParams = new MultiMap<string>().Create(inputOptions.QueryParams);
+            queryParams.Add(KbConfig.QUERY_AUDIT, auditLevel.ToString());
+            var requestOptions = inputOptions.Extend().WithQueryParams(queryParams).Build();
+
+            return client.Get<InvoicePayments>(uri, requestOptions);
+        }
+
+        public Payments GetPaymentsForAccount(Guid accountId, RequestOptions inputOptions, AuditLevel auditLevel = DefaultAuditLevel)
+        {
+            var uri = KbConfig.ACCOUNTS_PATH + "/" + accountId + "/" + KbConfig.PAYMENTS;
+
+            var queryParams = new MultiMap<string>().Create(inputOptions.QueryParams);
+            queryParams.Add(KbConfig.QUERY_AUDIT, auditLevel.ToString());
+            var requestOptions = inputOptions.Extend().WithQueryParams(queryParams).Build();
+
+            return client.Get<Payments>(uri, requestOptions);
+        }
+
+
+        #endregion
+
 
         //ACCOUNT EMAIL
         //-------------------------------------------------------------------------------------------------------------------------------------
-        public void AddEmailToAccount(AccountEmail email, string createdBy, string reason, string comment)
+        public void AddEmailToAccount(AccountEmail email, RequestOptions inputOptions)
         {
             if (email == null)
-                throw new ArgumentNullException("email");
+                throw new ArgumentNullException(nameof(email));
 
             if (email.AccountId.Equals(Guid.Empty))
                 throw new ArgumentException("AccountEmail#accountId cannot be empty");
-            var uri = KbConfig.ACCOUNTS_PATH + "/" + email.AccountId + "/" + KbConfig.EMAILS;
-            var options = ParamsWithAudit(createdBy, reason, comment);
 
-            client.Post(uri, email, options);
+            var uri = KbConfig.ACCOUNTS_PATH + "/" + email.AccountId + "/" + KbConfig.EMAILS;
+
+            client.Post(uri, email, inputOptions);
         }
 
-        public void RemoveEmailFromAccount(AccountEmail email, string createdBy, string reason, string comment)
+        public void RemoveEmailFromAccount(AccountEmail email, RequestOptions inputOptions)
         {
             if (email == null)
-                throw new ArgumentNullException("email");
+                throw new ArgumentNullException(nameof(email));
 
             if (email.AccountId.Equals(Guid.Empty))
                 throw new ArgumentException("AccountEmail#accountId cannot be empty");
-            
-            var uri = KbConfig.ACCOUNTS_PATH + "/" + email.AccountId + "/" + KbConfig.EMAILS;
-            var options = ParamsWithAudit(createdBy, reason, comment);
-            client.Delete(uri, options, options);
+
+            var uri = KbConfig.ACCOUNTS_PATH + "/" + email.AccountId + "/" + KbConfig.EMAILS + "/" +
+                      HttpUtility.UrlEncode(email.Email);
+
+            client.Delete(uri, inputOptions);
         }
 
         //ACCOUNT EMAILS
         //-------------------------------------------------------------------------------------------------------------------------------------
-        public AccountEmails GetEmailsForAccount(Guid accountId)
+
+        public AccountEmails GetEmailsForAccount(Guid accountId, RequestOptions inputOptions)
         {
             var uri = KbConfig.ACCOUNTS_PATH + "/" + accountId + "/" + KbConfig.EMAILS;
-            return client.Get<AccountEmails>(uri, DEFAULT_EMPTY_QUERY);
+            return client.Get<AccountEmails>(uri, inputOptions);
         }
 
         //ACCOUNT TIMELINE
         //-------------------------------------------------------------------------------------------------------------------------------------
-        public AccountTimeline GetAccountTimeline(Guid accountId, AuditLevel auditLevel = DEFAULT_AUDIT_LEVEL)
+        public AccountTimeline GetAccountTimeline(Guid accountId, RequestOptions inputOptions, AuditLevel auditLevel = DefaultAuditLevel)
         {
             var uri = KbConfig.ACCOUNTS_PATH + "/" + accountId + "/" + KbConfig.TIMELINE;
-            var queryparams = new MultiMap<string>();
-            queryparams.Add(KbConfig.QUERY_AUDIT, auditLevel.ToString());
-            return client.Get<AccountTimeline>(uri, queryparams);
+
+            var queryParams = new MultiMap<string>().Create(inputOptions.QueryParams);
+            queryParams.Add(KbConfig.QUERY_AUDIT, auditLevel.ToString());
+            var requestOptions = inputOptions.Extend().WithQueryParams(queryParams).Build();
+
+            return client.Get<AccountTimeline>(uri, requestOptions);
         }
 
         //BUNDLE
         //-------------------------------------------------------------------------------------------------------------------------------------        
-        public Bundle GetBundle(Guid bundleId)
+        public Bundle GetBundle(Guid bundleId, RequestOptions inputOptions)
         {
             var uri = KbConfig.BUNDLES_PATH + "/" + bundleId;
-            return client.Get<Bundle>(uri, DEFAULT_EMPTY_QUERY);
+            return client.Get<Bundle>(uri, inputOptions);
         }
 
-        public Bundle GetBundle(string externalKey)
+        public Bundle GetBundle(string externalKey, RequestOptions inputOptions)
         {
             var uri = KbConfig.BUNDLES_PATH;
-            var queryparams = new MultiMap<string>();
-            queryparams.Add(KbConfig.QUERY_EXTERNAL_KEY, externalKey);
-            return client.Get<Bundle>(uri, queryparams);
+
+            var queryParams = new MultiMap<string>().Create(inputOptions.QueryParams);
+            queryParams.Add(KbConfig.QUERY_EXTERNAL_KEY, externalKey);
+
+            var requestOptions = inputOptions.Extend().WithQueryParams(queryParams).Build();
+
+            return client.Get<Bundle>(uri, requestOptions);
         }
 
-        public Bundle TransferBundle(Bundle bundle, string createdBy, string reason, string comment)
+        public Bundle TransferBundle(Bundle bundle, RequestOptions inputOptions)
         {
             if (bundle == null)
-                throw new ArgumentNullException("bundle");
+                throw new ArgumentNullException(nameof(bundle));
 
             if (bundle.AccountId.Equals(Guid.Empty))
                 throw new ArgumentException("AccountEmail#accountId cannot be empty");
@@ -164,132 +214,191 @@ namespace KillBill.Client.Net
 
             var uri = KbConfig.BUNDLES_PATH + "/" + bundle.BundleId;
 
-            var options = ParamsWithAudit(createdBy, reason, comment);
-            return client.PutAndFollow<Bundle>(uri, bundle, options, DEFAULT_EMPTY_QUERY);
+            var followLocation = inputOptions.FollowLocation ?? true;
+            var requestOptions = inputOptions.Extend().WithFollowLocation(followLocation).Build();
+
+            return client.Put<Bundle>(uri, bundle, requestOptions);
         }
 
         //BUNDLES
         //-------------------------------------------------------------------------------------------------------------------------------------        
-        public Bundles GetAccountBundles(Guid accountId)
+        public Bundles GetAccountBundles(Guid accountId, RequestOptions inputOptions)
         {
             var uri = KbConfig.ACCOUNTS_PATH + "/" + accountId + "/" + KbConfig.BUNDLES;
-            return client.Get<Bundles>(uri, DEFAULT_EMPTY_QUERY);
+            return client.Get<Bundles>(uri, inputOptions);
         }
 
-        public Bundles GetBundles(long offset = 0L, long limit = 100L, AuditLevel auditLevel = DEFAULT_AUDIT_LEVEL)
+        public Bundles GetAccountBundles(Guid accountId, string externalKey, RequestOptions inputOptions)
+        {
+            var uri = KbConfig.ACCOUNTS_PATH + "/" + accountId + "/" + KbConfig.BUNDLES;
+
+            var queryParams = new MultiMap<string>().Create(inputOptions.QueryParams);
+            queryParams.Add(KbConfig.QUERY_EXTERNAL_KEY, externalKey);
+            var requestOptions = inputOptions.Extend().WithQueryParams(queryParams).Build();
+
+            return client.Get<Bundles>(uri, requestOptions);
+        }
+
+
+        public Bundles GetBundles(RequestOptions inputOptions, long offset = 0L, long limit = 100L, AuditLevel auditLevel = DefaultAuditLevel)
         {
             var uri = KbConfig.BUNDLES_PATH + "/" + KbConfig.PAGINATION;
-            var queryparams = new MultiMap<string>();
-            queryparams.Add(KbConfig.QUERY_SEARCH_OFFSET, offset.ToString());
-            queryparams.Add(KbConfig.QUERY_SEARCH_LIMIT, limit.ToString());
-            queryparams.Add(KbConfig.QUERY_AUDIT, auditLevel.ToString());
-            return client.Get<Bundles>(uri, queryparams);
+            var queryParams = new MultiMap<string>().Create(inputOptions.QueryParams);
+            queryParams.Add(KbConfig.QUERY_SEARCH_OFFSET, offset.ToString());
+            queryParams.Add(KbConfig.QUERY_SEARCH_LIMIT, limit.ToString());
+            queryParams.Add(KbConfig.QUERY_AUDIT, auditLevel.ToString());
+            var requestOptions = inputOptions.Extend().WithQueryParams(queryParams).Build();
+            return client.Get<Bundles>(uri, requestOptions);
         }
 
-        public Bundles SearchBundles(string key, long offset = 0L, long limit = 100L, AuditLevel auditLevel = DEFAULT_AUDIT_LEVEL)
+        public Bundles SearchBundles(string key, RequestOptions inputOptions, long offset = 0L, long limit = 100L, AuditLevel auditLevel = DefaultAuditLevel)
         {
-            var utf = Encoding.UTF8.GetBytes(key);
-            var uri = KbConfig.BUNDLES_PATH + "/" + KbConfig.SEARCH + "/" + Encoding.UTF8.GetString(utf); ;
-          
-            var queryparams = new MultiMap<string>();
-            queryparams.Add(KbConfig.QUERY_SEARCH_OFFSET, offset.ToString());
-            queryparams.Add(KbConfig.QUERY_SEARCH_LIMIT, limit.ToString());
-            queryparams.Add(KbConfig.QUERY_AUDIT, auditLevel.ToString());
-            return client.Get<Bundles>(uri, queryparams);
+            var uri = KbConfig.BUNDLES_PATH + "/" + KbConfig.SEARCH + "/" + HttpUtility.UrlEncode(key);
+
+            var queryParams = new MultiMap<string>().Create(inputOptions.QueryParams);
+            queryParams.Add(KbConfig.QUERY_SEARCH_OFFSET, offset.ToString());
+            queryParams.Add(KbConfig.QUERY_SEARCH_LIMIT, limit.ToString());
+            queryParams.Add(KbConfig.QUERY_AUDIT, auditLevel.ToString());
+
+            var requestOptions = inputOptions.Extend().WithQueryParams(queryParams).Build();
+
+            return client.Get<Bundles>(uri, requestOptions);
         }
 
-        
-        //CREDITS
+
+        //CREDIT
         //-------------------------------------------------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Creates a credit against an account. This also creates a new invoice.
-        /// </summary>
-        /// <param name="credit">Credit Object</param>
-        /// <returns>Processed credit object with populated invoice details.</returns>
-        public Credit CreateCredit(Credit credit, string createdBy, string reason, string comment)
+        public Credit CreateCredit(Credit credit, bool autoCommit, RequestOptions inputOptions)
         {
             if (credit == null)
-                throw new ArgumentNullException("credit");
+                throw new ArgumentNullException(nameof(credit));
             if (credit.AccountId.Equals(Guid.Empty))
                 throw new ArgumentException("Credit#accountId cannot be null");
             if (credit.CreditAmount <= 0)
                 throw new ArgumentException("Credit#CreditAmount must be greater than 0");
 
-            var options = ParamsWithAudit(createdBy, reason, comment);
-            return client.PostAndFollow<Credit>(KbConfig.CREDITS_PATH, credit, options, DEFAULT_EMPTY_QUERY);
+            var followLocation = inputOptions.FollowLocation ?? true;
+            var queryParams = new MultiMap<string>().Create(inputOptions.QueryParams);
+            queryParams.Add(KbConfig.QUERY_AUTO_COMMIT, autoCommit.ToString());
+            
+            var requestOptions = inputOptions.Extend().WithFollowLocation(followLocation).WithQueryParams(queryParams).Build();
+
+            return client.Post<Credit>(KbConfig.CREDITS_PATH, credit, requestOptions);
         }
 
 
-        public Credit GetCredit(Guid creditId, AuditLevel auditLevel)
+        public Credit GetCredit(Guid creditId, RequestOptions inputOptions, AuditLevel auditLevel = DefaultAuditLevel)
         {
             var uri = KbConfig.CREDITS_PATH + "/" + creditId;
-            var queryparams = new MultiMap<string>();
-            queryparams.Add(KbConfig.QUERY_AUDIT, auditLevel.ToString());
-            return client.Get<Credit>(uri, queryparams);
+            var queryParams = new MultiMap<string>().Create(inputOptions.QueryParams);
+            queryParams.Add(KbConfig.QUERY_AUDIT, auditLevel.ToString());
+            var requestOptions = inputOptions.Extend().WithQueryParams(queryParams).Build();
+            return client.Get<Credit>(uri, requestOptions);
         }
 
         //INVOICE
         //-------------------------------------------------------------------------------------------------------------------------------------
-        
-
         /// <summary>
         /// Triggers an invoice RUN!
         /// </summary>
         /// <remarks>Don't be fooled by the method name... this SHOULD NOT be used to create invoices. Invoices are created as a byproduct of other actions like 'Creating Credits', 'External Charges'</remarks>
-        public Invoice CreateInvoice(Guid accountId, Invoice invoice, DateTime futureDate, string createdBy, string reason,
-            string comment)
+        public Invoice CreateInvoice(Guid accountId, DateTime futureDate, RequestOptions inputOptions)
         {
-            var param = new MultiMap<string>();
-            param.Add(KbConfig.QUERY_ACCOUNT_ID, accountId.ToString());
-            param.Add(KbConfig.QUERY_TARGET_DATE, futureDate.ToDateString());
-            var options = ParamsWithAudit(param, createdBy, reason, comment);
+            var followLocation = inputOptions.FollowLocation ?? true;
 
-            return client.PostAndFollow<Invoice>(KbConfig.INVOICES_PATH, invoice, options, DEFAULT_EMPTY_QUERY);
+            var queryParams = new MultiMap<string>().Create(inputOptions.QueryParams);
+            queryParams.Add(KbConfig.QUERY_ACCOUNT_ID, accountId.ToString());
+            queryParams.Add(KbConfig.QUERY_TARGET_DATE, futureDate.ToDateString());
+
+            var requestOptions = inputOptions.Extend().WithFollowLocation(followLocation).WithQueryParams(queryParams).Build();
+            
+            return client.Post<Invoice>(KbConfig.INVOICES_PATH, null, requestOptions);
         }
 
-        public Invoice GetInvoice(int invoiceNumber, bool withItems = false, AuditLevel auditLevel = DEFAULT_AUDIT_LEVEL)
+        public Invoice GetInvoice(int invoiceNumber, RequestOptions inputOptions, bool withItems = false, bool withChildrenItems = false, AuditLevel auditLevel = DefaultAuditLevel)
         {
-            return GetInvoiceByIdOrNumber(invoiceNumber.ToString(), withItems, auditLevel);
+            return GetInvoiceByIdOrNumber(invoiceNumber.ToString(), inputOptions, withItems, withChildrenItems, auditLevel);
         }
-        public Invoice GetInvoice(string invoiceIdOrNumber, bool withItems=false, AuditLevel auditLevel = DEFAULT_AUDIT_LEVEL)
+
+        public Invoice GetInvoice(string invoiceIdOrNumber, RequestOptions inputOptions, bool withItems = false, bool withChildrenItems = false, AuditLevel auditLevel = DefaultAuditLevel)
         {
-            return GetInvoiceByIdOrNumber(invoiceIdOrNumber, withItems, auditLevel);
+            return GetInvoiceByIdOrNumber(invoiceIdOrNumber, inputOptions, withItems, withChildrenItems, auditLevel);
         }
-        public Invoice GetInvoiceByIdOrNumber(string invoiceIdOrNumber, bool withItems = false, AuditLevel auditLevel = DEFAULT_AUDIT_LEVEL)
+
+        public Invoice GetInvoiceByIdOrNumber(string invoiceIdOrNumber, RequestOptions inputOptions, bool withItems = false, bool withChildrenItems = false, AuditLevel auditLevel = DefaultAuditLevel)
         {
             var uri = KbConfig.INVOICES_PATH + "/" + invoiceIdOrNumber;
-            var queryparams = new MultiMap<string>();
-            queryparams.Add(KbConfig.QUERY_INVOICE_WITH_ITEMS, withItems.ToString());
-            queryparams.Add(KbConfig.QUERY_AUDIT, auditLevel.ToString());
+        
+            var queryParams = new MultiMap<string>().Create(inputOptions.QueryParams);
+            queryParams.Add(KbConfig.QUERY_INVOICE_WITH_ITEMS, withItems.ToString());
+            queryParams.Add(KbConfig.QUERY_INVOICE_WITH_CHILDREN_ITEMS, withChildrenItems.ToString());
+            queryParams.Add(KbConfig.QUERY_AUDIT, auditLevel.ToString());
 
-            return client.Get<Invoice>(uri, queryparams);
+            var requestOptions = inputOptions.Extend().WithQueryParams(queryParams).Build();
+
+            return client.Get<Invoice>(uri, requestOptions);
         }
 
         //INVOICES
         //-------------------------------------------------------------------------------------------------------------------------------------
-        public Invoices GetInvoicesForAccount(Guid accountId, bool withItems = false, bool unpaidOnly = false, AuditLevel auditLevel = DEFAULT_AUDIT_LEVEL)
+        public Invoices GetInvoices(RequestOptions inputOptions)
+        {
+            return GetInvoices(true, 0L, 100L, inputOptions);
+        }
+
+        public Invoices GetInvoices(bool withItems, long offset, long limit, RequestOptions inputOptions, AuditLevel auditLevel = AuditLevel.NONE)
+        {
+            var uri = KbConfig.INVOICES_PATH + "/" + KbConfig.PAGINATION;
+
+            var queryParams = new MultiMap<string>().Create(inputOptions.QueryParams);
+            queryParams.Add(KbConfig.QUERY_SEARCH_OFFSET, offset.ToString());
+            queryParams.Add(KbConfig.QUERY_SEARCH_LIMIT, limit.ToString());
+            queryParams.Add(KbConfig.QUERY_INVOICE_WITH_ITEMS, withItems.ToString());
+            queryParams.Add(KbConfig.QUERY_AUDIT, auditLevel.ToString());
+
+            var requestOptions = inputOptions.Extend().WithQueryParams(queryParams).Build();
+
+            return client.Get<Invoices>(uri, requestOptions);
+        }
+
+        public Invoices GetInvoicesForAccount(Guid accountId, RequestOptions inputOptions, bool withItems = false, bool unpaidOnly = false, bool includeMigrationInvoices = false, AuditLevel auditLevel = DefaultAuditLevel)
         {
 
             var uri = KbConfig.ACCOUNTS_PATH + "/" + accountId + "/" + KbConfig.INVOICES;
 
-            var options = new MultiMap<string>();
-            options.Add(KbConfig.QUERY_INVOICE_WITH_ITEMS, withItems.ToString());
-            options.Add(KbConfig.QUERY_UNPAID_INVOICES_ONLY, unpaidOnly.ToString());
-            options.Add(KbConfig.QUERY_AUDIT, auditLevel.ToString());
+            var queryParams = new MultiMap<string>().Create(inputOptions.QueryParams);
+            queryParams.Add(KbConfig.QUERY_INVOICE_WITH_ITEMS, withItems.ToString());
+            queryParams.Add(KbConfig.QUERY_UNPAID_INVOICES_ONLY, unpaidOnly.ToString());
+            queryParams.Add(KbConfig.QUERY_WITH_MIGRATION_INVOICES, includeMigrationInvoices.ToString());
+            queryParams.Add(KbConfig.QUERY_AUDIT, auditLevel.ToString());
 
-            return client.Get<Invoices>(uri, options);
+            var requestOptions = inputOptions.Extend().WithQueryParams(queryParams).Build();
+
+            return client.Get<Invoices>(uri, requestOptions);
         }
 
+        public Invoices SearchInvoices(string key, RequestOptions inputOptions)
+        {
+            return SearchInvoices(key, 0L, 100L, DefaultAuditLevel, inputOptions);
+        }
 
-        public Invoices SearchInvoices(string key, long offset = 0L, long limit= 100L, AuditLevel auditLevel = DEFAULT_AUDIT_LEVEL)
+        public Invoices SearchInvoices(string key, long offset, long limit, RequestOptions inputOptions)
+        {
+            return SearchInvoices(key, offset, limit, DefaultAuditLevel, inputOptions);
+        }
+
+        public Invoices SearchInvoices(string key, long offset, long limit, AuditLevel auditLevel, RequestOptions inputOptions)
         {
             var utf = Encoding.UTF8.GetBytes(key);
-            var uri = KbConfig.INVOICES_PATH + "/" + KbConfig.SEARCH + "/" + Encoding.UTF8.GetString(utf); ;
-            var queryparams = new MultiMap<string>();
-            queryparams.Add(KbConfig.QUERY_SEARCH_OFFSET, offset.ToString());
-            queryparams.Add(KbConfig.QUERY_SEARCH_LIMIT, limit.ToString());
-            queryparams.Add(KbConfig.QUERY_AUDIT, auditLevel.ToString());
-            return client.Get<Invoices>(uri, queryparams);
+            var uri = KbConfig.INVOICES_PATH + "/" + KbConfig.SEARCH + "/" + Encoding.UTF8.GetString(utf);
+
+            var queryParams = new MultiMap<string>().Create(inputOptions.QueryParams);
+            queryParams.Add(KbConfig.QUERY_SEARCH_OFFSET, offset.ToString());
+            queryParams.Add(KbConfig.QUERY_SEARCH_LIMIT, limit.ToString());
+            queryParams.Add(KbConfig.QUERY_AUDIT, auditLevel.ToString());
+
+            var requestOptions = inputOptions.Extend().WithQueryParams(queryParams).Build();
+            return client.Get<Invoices>(uri, requestOptions);
         }
 
         //INVOICE ITEM
@@ -299,21 +408,28 @@ namespace KillBill.Client.Net
         /// </summary>
         /// <remarks>The currency on each charges needs to be the same as the currency on the referenced account.</remarks>
         /// <returns>List of processed charges with invoice references.</returns>
-        public List<InvoiceItem> CreateExternalCharge(IEnumerable<InvoiceItem> externalCharges, DateTime requestedDate,
-            bool autoPay, string createdBy, string reason, string comment)
+
+        public List<InvoiceItem> CreateExternalCharges(IEnumerable<InvoiceItem> externalCharges, DateTime? requestedDate,
+            bool autoPay, bool autoCommit, RequestOptions inputOptions)
         {
-            var externalChargesPerAccount = new Dictionary<Guid, Collection<InvoiceItem>>();
-            
+            return CreateExternalCharges(externalCharges, requestedDate, autoPay, autoCommit, null, null, inputOptions);
+        }
+
+        public List<InvoiceItem> CreateExternalCharges(IEnumerable<InvoiceItem> externalCharges, DateTime? requestedDate,
+                bool autoPay, bool autoCommit, string paymentExternalKey, string transactionExternalKey, RequestOptions inputOptions)
+        {
+            var externalChargesPerAccount = new Dictionary<Guid, List<InvoiceItem>>();
+
             foreach (var externalCharge in externalCharges)
             {
                 if (externalCharge.AccountId == Guid.Empty)
                     throw new ArgumentException("InvoiceItem#accountId cannot be empty");
 
                 if (string.IsNullOrEmpty(externalCharge.Currency))
-                 throw new ArgumentException("InvoiceItem#currency cannot be empty");
+                    throw new ArgumentException("InvoiceItem#currency cannot be empty");
 
                 if (!externalChargesPerAccount.ContainsKey(externalCharge.AccountId))
-                    externalChargesPerAccount.Add(externalCharge.AccountId, new Collection<InvoiceItem>());
+                    externalChargesPerAccount.Add(externalCharge.AccountId, new List<InvoiceItem>());
 
                 externalChargesPerAccount[externalCharge.AccountId].Add(externalCharge);
             }
@@ -321,66 +437,87 @@ namespace KillBill.Client.Net
             var createdExternalCharges = new List<InvoiceItem>();
             foreach (var accountId in externalChargesPerAccount.Keys)
             {
-                var invoiceItems = CreateExternalCharges(accountId, externalChargesPerAccount[accountId], requestedDate, autoPay, createdBy, reason, comment);
+                var invoiceItems = CreateExternalCharges(accountId, externalChargesPerAccount[accountId], requestedDate, autoPay, autoCommit, paymentExternalKey, paymentExternalKey, inputOptions);
                 createdExternalCharges.AddRange(invoiceItems);
             }
 
             return createdExternalCharges;
         }
 
-        private IEnumerable<InvoiceItem> CreateExternalCharges(Guid accountId, Collection<InvoiceItem> externalCharges, DateTime requestedDate, bool autoPay, string createdBy, string reason, string comment)
+        private IEnumerable<InvoiceItem> CreateExternalCharges(Guid accountId, IEnumerable<InvoiceItem> externalCharges, DateTime? requestedDate, bool autoPay, bool autoCommit, string paymentExternalKey, string transactionExternalKey, RequestOptions inputOptions)
         {
             var uri = KbConfig.INVOICES_PATH + "/" + KbConfig.CHARGES + "/" + accountId;
 
-            var options = new MultiMap<string>();
-            options.Add(KbConfig.QUERY_REQUESTED_DT, requestedDate.ToDateString());
-            options.Add(KbConfig.QUERY_PAY_INVOICE, autoPay.ToString());
-            
-            var fullOptions = ParamsWithAudit(options, createdBy, reason, comment);
+            var queryParams = new MultiMap<string>();
 
-            return client.Post<List<InvoiceItem>>(uri, externalCharges, fullOptions);
+            if (requestedDate.HasValue)
+            {
+                queryParams.Add(KbConfig.QUERY_REQUESTED_DT, requestedDate.Value.ToDateString());
+            }
+
+            queryParams.Add(KbConfig.QUERY_PAY_INVOICE, autoPay.ToString());
+            queryParams.Add(KbConfig.QUERY_AUTO_COMMIT, autoCommit.ToString());
+
+            if (!string.IsNullOrEmpty(paymentExternalKey))
+            {
+                queryParams.Add(KbConfig.QUERY_PAYMENT_EXT_KEY, paymentExternalKey);
+            }
+
+            if (!string.IsNullOrEmpty(transactionExternalKey))
+            {
+                queryParams.Add(KbConfig.QUERY_TRANSACTION_EXT_KEY, transactionExternalKey);
+            }
+
+            var requestOptions = inputOptions.Extend().WithQueryParams(queryParams).Build();
+
+            return client.Post<List<InvoiceItem>>(uri, externalCharges, requestOptions);
         }
 
         //INVOICE EMAIL
         //-------------------------------------------------------------------------------------------------------------------------------------
-        public InvoiceEmail GetEmailNotificationsForAccount(Guid accountId)
+        public InvoiceEmail GetEmailNotificationsForAccount(Guid accountId, RequestOptions inputOptions)
         {
             var uri = KbConfig.ACCOUNTS_PATH + "/" + accountId + "/" + KbConfig.EMAIL_NOTIFICATIONS;
-            return client.Get<InvoiceEmail>(uri, DEFAULT_EMPTY_QUERY);
+            return client.Get<InvoiceEmail>(uri, inputOptions);
         }
 
-        public void UpdateEmailNotificationsForAccount(InvoiceEmail invoiceEmail, string createdBy, string reason,
-            string comment)
+        public void UpdateEmailNotificationsForAccount(InvoiceEmail invoiceEmail, RequestOptions inputOptions)
         {
+            if (invoiceEmail.AccountId.Equals(Guid.Empty))
+                throw new ArgumentException("invoiceEmail#AccountId can not be empty");
+
             var uri = KbConfig.ACCOUNTS_PATH + "/" + invoiceEmail.AccountId + "/" + KbConfig.EMAIL_NOTIFICATIONS;
-            var options = ParamsWithAudit(createdBy, reason, comment);
-            client.Put(uri, invoiceEmail, options);
+            client.Put(uri, invoiceEmail, inputOptions);
         }
 
         //PAYMENT
         //-------------------------------------------------------------------------------------------------------------------------------------
-        public Payment CreatePayment(Guid accountId, PaymentTransaction paymentTransaction, string createdBy, string reason, string comment)
+        public Payment CreatePayment(Guid accountId, PaymentTransaction paymentTransaction, RequestOptions inputOptions)
         {
-            return CreatePayment(accountId, null, paymentTransaction, new Dictionary<string, string>(), createdBy, reason, comment);
+            return CreatePayment(accountId, null, paymentTransaction, null, new Dictionary<string, string>(), inputOptions);
         }
 
-        public Payment CreatePayment(Guid accountId, PaymentTransaction paymentTransaction, Dictionary<string, string> pluginProperties, string createdBy, string reason, string comment)
+        public Payment CreatePayment(Guid accountId, PaymentTransaction paymentTransaction, Dictionary<string, string> pluginProperties, RequestOptions inputOptions)
         {
-            return CreatePayment(accountId, null, paymentTransaction, pluginProperties, createdBy, reason, comment);
+            return CreatePayment(accountId, null, paymentTransaction, null, pluginProperties, inputOptions);
         }
-        public Payment CreatePayment(Guid accountId, Guid? paymentMethodId, PaymentTransaction paymentTransaction, string createdBy, string reason, string comment)
+        public Payment CreatePayment(Guid accountId, Guid? paymentMethodId, PaymentTransaction paymentTransaction, RequestOptions inputOptions)
         {
-            return CreatePayment(accountId, paymentMethodId, paymentTransaction, new Dictionary<string, string>(), createdBy, reason, comment);
+            return CreatePayment(accountId, paymentMethodId, paymentTransaction, null, new Dictionary<string, string>(), inputOptions);
         }
-        public Payment CreatePayment(Guid accountId, Guid? paymentMethodId, PaymentTransaction paymentTransaction, Dictionary<string, string> pluginProperties, string createdBy, string reason, string comment)
+        public Payment CreatePayment(Guid accountId, Guid? paymentMethodId, PaymentTransaction paymentTransaction, Dictionary<string, string> pluginProperties, RequestOptions inputOptions)
+        {
+            return CreatePayment(accountId, paymentMethodId, paymentTransaction, null, pluginProperties, inputOptions);
+        }
+        public Payment CreatePayment(Guid accountId, Guid? paymentMethodId, PaymentTransaction paymentTransaction, List<string> controlPluginNames, Dictionary<string, string> pluginProperties, RequestOptions inputOptions)
         {
 
-            var allowedTransactionTypes = new[] {"AUTHORIZE", "CREDIT", "PURCHASE"};
+            var allowedTransactionTypes = new[] { "AUTHORIZE", "CREDIT", "PURCHASE" };
             if (accountId.Equals(Guid.Empty))
                 throw new ArgumentException("createPayment#accountId must not be empty");
 
             if (paymentTransaction == null)
-                throw new ArgumentNullException("paymentTransaction");
+                throw new ArgumentNullException(nameof(paymentTransaction));
 
             if (!allowedTransactionTypes.Contains(paymentTransaction.TransactionType))
                 throw new ArgumentException("Invalid paymentTransaction type " + paymentTransaction.TransactionType);
@@ -393,175 +530,217 @@ namespace KillBill.Client.Net
 
             var uri = KbConfig.ACCOUNTS_PATH + "/" + accountId + "/" + KbConfig.PAYMENTS;
 
-            var param = new MultiMap<string>();
+            var param = new MultiMap<string>().Create(inputOptions.QueryParams);
 
             if (paymentMethodId.HasValue)
                 param.Add("paymentMethodId", paymentMethodId.ToString());
 
+            if (controlPluginNames != null && controlPluginNames.Count > 0) {
+                param.PutAll(KbConfig.CONTROL_PLUGIN_NAME, controlPluginNames);
+            }
+                
+
             StorePluginPropertiesAsParams(pluginProperties, ref param);
-            
-            var queryParams = ParamsWithAudit(param,createdBy,reason,comment);
+            var followLocation = inputOptions.FollowLocation ?? true;
+            var requestOptions = inputOptions.Extend().WithQueryParams(param).WithFollowLocation(followLocation).Build();
 
-            return client.PostAndFollow<Payment>(uri, paymentTransaction, queryParams, DEFAULT_EMPTY_QUERY);
-
+            return client.Post<Payment>(uri, paymentTransaction, requestOptions);
         }
 
 
         //PAYMENT METHODS
         //-------------------------------------------------------------------------------------------------------------------------------------
-        public PaymentMethod GetPaymentMethod(Guid paymentMethodId, bool withPluginInfo = false,
-            AuditLevel auditLevel = DEFAULT_AUDIT_LEVEL)
+        public PaymentMethod GetPaymentMethod(Guid paymentMethodId, RequestOptions inputOptions, bool withPluginInfo = false, AuditLevel auditLevel = DefaultAuditLevel)
         {
             var uri = KbConfig.PAYMENT_METHODS_PATH + "/" + paymentMethodId;
 
-            var options = new MultiMap<string>();
-            options.Add(KbConfig.QUERY_WITH_PLUGIN_INFO, withPluginInfo.ToString());
-            options.Add(KbConfig.QUERY_AUDIT, auditLevel.ToString());
-
-            return client.Get<PaymentMethod>(uri, options);
+            var queryParams = new MultiMap<string>().Create(inputOptions.QueryParams);
+            queryParams.Add(KbConfig.QUERY_WITH_PLUGIN_INFO, withPluginInfo.ToString());
+            queryParams.Add(KbConfig.QUERY_AUDIT, auditLevel.ToString());
+            var requestOptions = inputOptions.Extend().WithQueryParams(queryParams).Build();
+            
+            return client.Get<PaymentMethod>(uri, requestOptions);
 
         }
 
-        public PaymentMethods GetPaymentMethodsForAccount(Guid accountId, bool withPluginInfo = false)  {
+        public PaymentMethods GetPaymentMethodsForAccount(Guid accountId, RequestOptions inputOptions, Dictionary<string, string> pluginProperties = null,  bool withPluginInfo = false, AuditLevel auditLevel = DefaultAuditLevel)
+        {
             var uri = KbConfig.ACCOUNTS_PATH + "/" + accountId + "/" + KbConfig.PAYMENT_METHODS;
 
-            var options = new MultiMap<string>();
-            options.Add(KbConfig.QUERY_WITH_PLUGIN_INFO, withPluginInfo.ToString());
+            var queryParams = new MultiMap<string>().Create(inputOptions.QueryParams);
+            queryParams.Add(KbConfig.QUERY_WITH_PLUGIN_INFO, withPluginInfo.ToString());
+            queryParams.Add(KbConfig.QUERY_AUDIT, auditLevel.ToString());
+            StorePluginPropertiesAsParams(pluginProperties, ref queryParams);
+            var requestOptions = inputOptions.Extend().WithQueryParams(queryParams).Build();
 
-            return client.Get<PaymentMethods>(uri, options);
+            return client.Get<PaymentMethods>(uri, requestOptions);
         }
 
-       
 
-        public PaymentMethod CreatePaymentMethod(PaymentMethod paymentMethod, string createdBy, string reason,
-            string comment)
+
+        public PaymentMethod CreatePaymentMethod(PaymentMethod paymentMethod, RequestOptions inputOptions)
         {
             if (paymentMethod == null)
-                throw new ArgumentNullException("paymentMethod");
+                throw new ArgumentNullException(nameof(paymentMethod));
 
             if (paymentMethod.AccountId.Equals(Guid.Empty) || string.IsNullOrEmpty(paymentMethod.PluginName))
                 throw new ArgumentException("paymentMethod#accountId and paymentMethod#pluginName must not be empty");
 
             var uri = KbConfig.ACCOUNTS_PATH + "/" + paymentMethod.AccountId + "/" + KbConfig.PAYMENT_METHODS;
-            var queryparams = ParamsWithAudit(createdBy, reason, comment);
-            return client.PostAndFollow<PaymentMethod>(uri, paymentMethod, queryparams, DEFAULT_EMPTY_QUERY);
+            var followLocation = inputOptions.FollowLocation ?? true;
+            var queryParams = new MultiMap<string>().Create(inputOptions.QueryParams);
+            queryParams.Add(KbConfig.QUERY_PAYMENT_METHOD_IS_DEFAULT, paymentMethod.IsDefault ? "true" : "false");
 
+            var requestOptions = inputOptions.Extend().WithFollowLocation(followLocation).WithQueryParams(queryParams).Build();
+
+            return client.Post<PaymentMethod>(uri, paymentMethod, requestOptions);
         }
 
-        public void DeletePaymentMethod(Guid paymentMethodId, bool deleteDefault, string createdBy, string reason, string comment,  bool forceDelete = false, bool forceDeleteDefault = false)
+        public void DeletePaymentMethod(Guid paymentMethodId, RequestOptions inputOptions, bool deleteDefault = false, bool forceDeleteDefault = false)
         {
             var uri = KbConfig.PAYMENT_METHODS_PATH + "/" + paymentMethodId;
-            var options = new MultiMap<string>();
-            options.Add(KbConfig.QUERY_DELETE_DEFAULT_PM_WITH_AUTO_PAY_OFF, deleteDefault.ToString());
-            options.Add(KbConfig.QUERY_FORCE_DEFAULT_PM_DELETION, forceDeleteDefault.ToString());
-            var queryparams = ParamsWithAudit(options, createdBy, reason, comment);
-            client.Delete(uri, queryparams);
+            var queryParams = new MultiMap<string>().Create(inputOptions.QueryParams);
+            queryParams.Add(KbConfig.QUERY_DELETE_DEFAULT_PM_WITH_AUTO_PAY_OFF, deleteDefault.ToString());
+            queryParams.Add(KbConfig.QUERY_FORCE_DEFAULT_PM_DELETION, forceDeleteDefault.ToString());
+            var requestOptions = inputOptions.Extend().WithQueryParams(queryParams).Build();
+            client.Delete(uri, requestOptions);
         }
 
+        public void UpdateDefaultPaymentMethod(Guid accountId, Guid paymentMethodId, RequestOptions inputOptions)
+        {
+            var uri = KbConfig.ACCOUNTS_PATH + "/" + accountId + "/" + KbConfig.PAYMENT_METHODS + "/" + paymentMethodId + "/" + KbConfig.PAYMENT_METHODS_DEFAULT_PATH_POSTFIX;
+            client.Put(uri, null, inputOptions);
+        }
 
         //TENANT    
         //-------------------------------------------------------------------------------------------------------------------------------------
-        public Tenant CreateTenant(Tenant tenant, string createdBy, string reason, string comment)
+        public Tenant CreateTenant(Tenant tenant, RequestOptions inputOptions, bool useGlobalDefault = true)
         {
             if (tenant == null)
-                throw new ArgumentNullException("tenant");
+                throw new ArgumentNullException(nameof(tenant));
 
-            if (string.IsNullOrEmpty(tenant.ApiKey) || string.IsNullOrEmpty(tenant.ApiSecret)) 
+            if (string.IsNullOrEmpty(tenant.ApiKey) || string.IsNullOrEmpty(tenant.ApiSecret))
                 throw new ArgumentException("tenant#apiKey and tenant#apiSecret must not be empty");
 
-            
-            var queryparams = ParamsWithAudit(createdBy, reason, comment);
-            return client.PostAndFollow<Tenant>(KbConfig.TENANTS_PATH, tenant, queryparams, DEFAULT_EMPTY_QUERY);
+            var followLocation = inputOptions.FollowLocation ?? true;
+            var queryParams = new MultiMap<string>().Create(inputOptions.QueryParams);
+            queryParams.Add(KbConfig.QUERY_TENANT_USE_GLOBAL_DEFAULT, useGlobalDefault.ToString());
+            var requestOptions = inputOptions.Extend().WithFollowLocation(followLocation).WithQueryParams(queryParams).Build();
+            return client.Post<Tenant>(KbConfig.TENANTS_PATH, tenant, requestOptions);
         }
 
 
-        public void DeleteCallbackNotificationForTenanr(Guid tenantId, string createdBy, string reason,
-            string comment)
+        public void UnregisterCallbackNotificationForTenant(Guid tenantId, RequestOptions inputOptions)
         {
-            var queryparams = ParamsWithAudit(createdBy, reason, comment);
             var uri = KbConfig.TENANTS_PATH + "/" + KbConfig.LEGACY_REGISTER_NOTIFICATION_CALLBACK;
-            client.Delete(uri, queryparams);
-        }
-        public TenantKey RegisterCallBackNotificationForTenant(string callback, string createdBy, string reason,
-            string comment)
-        {
-            var options = new MultiMap<string>();
-            options.Add(KbConfig.QUERY_NOTIFICATION_CALLBACK, callback);
-            var queryparams = ParamsWithAudit(options, createdBy, reason, comment);
-            var uri = KbConfig.TENANTS_PATH + "/" + KbConfig.REGISTER_NOTIFICATION_CALLBACK;
-            return client.PostAndFollow<TenantKey>(uri, null, queryparams, DEFAULT_EMPTY_QUERY);
+            client.Delete(uri, inputOptions);
         }
 
-        public TenantKey RetrieveRegisteredCallBacks()
+
+        public TenantKey RegisterCallBackNotificationForTenant(string callback, RequestOptions inputOptions)
         {
             var uri = KbConfig.TENANTS_PATH + "/" + KbConfig.REGISTER_NOTIFICATION_CALLBACK;
-            return client.Get<TenantKey>(uri, DEFAULT_EMPTY_QUERY);
+            var followLocation = inputOptions.FollowLocation ?? true;
+            var queryParams = new MultiMap<string>().Create(inputOptions.QueryParams);
+            queryParams.Add(KbConfig.QUERY_NOTIFICATION_CALLBACK, callback);
+            var requestOptions = inputOptions.Extend().WithFollowLocation(followLocation).WithQueryParams(queryParams).Build();
+            return client.Post<TenantKey>(uri, null, requestOptions);
+        }
+
+        public TenantKey GetCallbackNotificationForTenant(RequestOptions inputOptions)
+        {
+            var uri = KbConfig.TENANTS_PATH + "/" + KbConfig.REGISTER_NOTIFICATION_CALLBACK;
+            return client.Get<TenantKey>(uri, inputOptions);
         }
 
         //SUBSCRIPTION
         //-------------------------------------------------------------------------------------------------------------------------------------
 
         // subscription:create
-        public Subscription GetSubscription(Guid subscriptionId)
+        public Subscription GetSubscription(Guid subscriptionId, RequestOptions inputOptions)
         {
             var uri = KbConfig.SUBSCRIPTIONS_PATH + "/" + subscriptionId;
-            return client.Get<Subscription>(uri, DEFAULT_EMPTY_QUERY);
+            return client.Get<Subscription>(uri, inputOptions);
         }
 
-        public Subscription CreateSubscription(Subscription subscription, string createdBy, string reason, string comment)
-        {
-            return CreateSubscription(subscription, null, createdBy, reason, comment);
-        }
 
-        public Subscription CreateSubscription(Subscription subscription, DateTime? requestedDate, string createdBy, string reason, string comment)
+        public Subscription CreateSubscription(Subscription subscription, RequestOptions inputOptions, DateTime? requestedDate = null, bool? isMigrated = null)
         {
-            if (subscription == null)
-                throw new ArgumentException("subscription");
+            //var httpTimeout = KbConfig.DEFAULT_HTTP_TIMEOUT_SEC;
+            var followLocation = inputOptions.FollowLocation ?? true;
 
-            var param = new MultiMap<string>();
+            if (subscription.PlanName == null)
+            {
+                if (subscription.AccountId.Equals(Guid.Empty))
+                    throw new ArgumentException("Subscription#accountId cannot be empty");
+
+                if (string.IsNullOrEmpty(subscription.ProductName))
+                    throw new ArgumentException("Subscription#productName cannot be null");
+
+                if (string.IsNullOrEmpty(subscription.ProductCategory))
+                    throw new ArgumentException("Subscription#productCategory cannot be null");
+
+                if (string.IsNullOrEmpty(subscription.BillingPeriod))
+                    throw new ArgumentException("Subscription#billingPeriod cannot be null");
+
+                if (string.IsNullOrEmpty(subscription.PriceList))
+                    throw new ArgumentException("Subscription#priceList cannot be null");
+            }
+
+            if (subscription.ProductCategory == "BASE")
+            {
+                if (subscription.AccountId.Equals(Guid.Empty))
+                    throw new ArgumentException("Subscription#accountId cannot be empty");
+            }
+
+            var queryParams = new MultiMap<string>().Create(inputOptions.QueryParams);
+            
+
+            //if (timeoutSec.HasValue)
+            //{
+            //    queryParams.Add(KbConfig.QUERY_CALL_COMPLETION, timeoutSec.Value > 0 ? "true" : "false");
+            //    queryParams.Add(KbConfig.QUERY_CALL_TIMEOUT, timeoutSec.Value.ToString());
+            //    timeoutSec = timeoutSec.Value;
+            //}
+            
             if (requestedDate.HasValue)
-                param.Add(KbConfig.QUERY_REQUESTED_DT, requestedDate.Value.ToDateTimeISO());
+            {
+                queryParams.Add(KbConfig.QUERY_REQUESTED_DT, requestedDate.Value.ToShortDateString());
+            }
 
-            var options = ParamsWithAudit(param, createdBy, reason, comment);
+            if (isMigrated.HasValue)
+            {
+                queryParams.Add(KbConfig.QUERY_MIGRATED, isMigrated.ToString());
+            }
 
-            return client.Post<Subscription>(KbConfig.SUBSCRIPTIONS_PATH, subscription, options, null, true);
+           
+            var requestOptions = inputOptions.Extend().WithQueryParams(queryParams).WithFollowLocation(followLocation).Build();
+
+            //return client.Post<Subscription>(KbConfig.SUBSCRIPTIONS_PATH, subscription, requestOptions, httpTimeout);
+            return client.Post<Subscription>(KbConfig.SUBSCRIPTIONS_PATH, subscription, requestOptions);
         }
 
         // subscription:update
 
 
         // subscription:cancel
-
-
-        private MultiMap<String> ParamsWithAudit(MultiMap<String> queryParams, string createdBy, string reason, string comment)
-        {
-            var queryParamsWithAudit = new MultiMap<string>();
-            queryParamsWithAudit.PutAll(queryParams);
-            queryParamsWithAudit.PutAll(ParamsWithAudit(createdBy, reason, comment));
-            return queryParamsWithAudit;
-        }
-
-        private MultiMap<string> ParamsWithAudit(string createdBy,string reason, string comment)
-        {
-            var options = new MultiMap<string>();
-            
-            options.Add(KbConfig.AUDIT_OPTION_CREATED_BY, createdBy);
-            options.Add(KbConfig.AUDIT_OPTION_COMMENT, comment);
-            options.Add(KbConfig.AUDIT_OPTION_REASON, reason);
-
-            return options;
-        }
+      
 
         private void StorePluginPropertiesAsParams(Dictionary<string, string> pluginProperties,
             ref MultiMap<string> queryParams)
         {
+            if (pluginProperties == null)
+                return;
+
             foreach (var key in pluginProperties.Keys)
             {
                 if (queryParams == null)
                     queryParams = new MultiMap<string>();
 
-                queryParams.Add(KbConfig.QUERY_PLUGIN_PROPERTY, string.Format("{0}={1}", Encoding.UTF8.GetBytes(key), HttpUtility.UrlEncode(pluginProperties[key])));
+                queryParams.Add(KbConfig.QUERY_PLUGIN_PROPERTY, $"{Encoding.UTF8.GetBytes(key)}={HttpUtility.UrlEncode(pluginProperties[key])}");
             }
         }
+
+        
     }
 }

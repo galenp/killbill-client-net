@@ -11,7 +11,7 @@ namespace KillBill.Client.Net.Tests.SafeTests
         public void Get_Invoice_By_Id(string invoiceId)
         {
             //When
-            var invoice = Client.GetInvoice(invoiceId);
+            var invoice = Client.GetInvoice(invoiceId, Options);
 
             //Then
             invoice.Should().NotBeNull();
@@ -23,7 +23,7 @@ namespace KillBill.Client.Net.Tests.SafeTests
         public void Get_Invoice_By_Number(int invoiceNumber)
         {
             //When
-            var invoice = Client.GetInvoice(invoiceNumber);
+            var invoice = Client.GetInvoice(invoiceNumber, Options);
 
             //Then
             invoice.Should().NotBeNull();
@@ -35,7 +35,7 @@ namespace KillBill.Client.Net.Tests.SafeTests
         public void Search_Invoices_By_InvoiceId(string searchTerm)
         {
             //When
-            var invoices = Client.SearchInvoices(searchTerm);
+            var invoices = Client.SearchInvoices(searchTerm, Options);
 
             //Then
             invoices.Should().NotBeNull();
@@ -47,7 +47,7 @@ namespace KillBill.Client.Net.Tests.SafeTests
         public void Search_Invoices_By_InvoiceNumber(string searchTerm)
         {
             //When
-            var searchResults = Client.SearchInvoices(searchTerm);
+            var searchResults = Client.SearchInvoices(searchTerm, Options);
 
             //Then
             searchResults.Should().NotBeNull();

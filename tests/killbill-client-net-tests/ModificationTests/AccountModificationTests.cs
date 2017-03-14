@@ -54,7 +54,7 @@ namespace KillBill.Client.Net.Tests.ModificationTests
             
 
             //When
-            var updatedAccount = Client.UpdateAccount(updateAccount, userName, "updated account", "changed address");
+            var updatedAccount = Client.UpdateAccount(updateAccount, Options);
 
             //Then
             updatedAccount.Should().NotBeNull();
@@ -69,7 +69,7 @@ namespace KillBill.Client.Net.Tests.ModificationTests
             var email = new AccountEmail {AccountId = AccountId, Email = "tester@test.com"};
 
             //When
-            Client.AddEmailToAccount(email, CreatedBy, Reason, "AccountModificationTests:Add_Email_To_Account");
+            Client.AddEmailToAccount(email, Options);
 
             //Then -- it should not error.....
         }
@@ -88,7 +88,7 @@ namespace KillBill.Client.Net.Tests.ModificationTests
             var email = new AccountEmail { AccountId = AccountId, Email = "tester@test.com" };
 
             //When
-            Client.RemoveEmailFromAccount(email, CreatedBy, Reason, "AccountModificationTests:Remove_Email_From_Account");
+            Client.RemoveEmailFromAccount(email, Options);
 
             //Then -- it should not error.....
         }
@@ -102,10 +102,10 @@ namespace KillBill.Client.Net.Tests.ModificationTests
             var invoiceEmail = new InvoiceEmail {AccountId = AccountId, IsNotifiedForInvoices = notificationSetting};
 
             //When
-            Client.UpdateEmailNotificationsForAccount(invoiceEmail, CreatedBy, Reason, "AccountModificationTests:Update_Email_Notifications_For_Account");
+            Client.UpdateEmailNotificationsForAccount(invoiceEmail, Options);
 
             //Then
-            var setting = Client.GetEmailNotificationsForAccount(AccountId);
+            var setting = Client.GetEmailNotificationsForAccount(AccountId, Options);
             setting.Should().NotBeNull();
             setting.AccountId.Should().Be(AccountId);
             setting.IsNotifiedForInvoices.Should().Be(notificationSetting);
