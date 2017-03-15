@@ -18,16 +18,11 @@ namespace KillBill.Client.Net
             this.client = client;
         }
 
-        public RequestOptions BaseOptions(string requestId, string createdBy, string reason = null, string comment = null)
+        public RequestOptions BaseOptions(string createdBy = null, string requestId = null, string reason = null, string comment = null)
         {
-            return RequestOptions.Builder()
-                                    .WithRequestId(Guid.NewGuid().ToString())
+            return RequestOptions.Default().Extend()
                                     .WithCreatedBy(createdBy)
                                     .WithReason(reason)
-                                    .WithUser(KbConfig.HttpUser)
-                                    .WithPassword(KbConfig.HttpPassword)
-                                    .WithTenantApiKey(KbConfig.ApiKey)
-                                    .WithTenantApiSecret(KbConfig.ApiSecret)
                                     .WithComment(comment)
                                     .Build();
         }

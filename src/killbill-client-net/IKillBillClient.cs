@@ -8,7 +8,7 @@ namespace KillBill.Client.Net
     public interface IKillBillClient
     {
         //REQUEST OPTIONS
-        RequestOptions BaseOptions(string requestId, string createdBy, string reason = null, string comment = null);
+        RequestOptions BaseOptions( string createdBy = null, string requestId = null, string reason = null, string comment = null);
        
         // ACCOUNT
         Account GetAccount(Guid accountId, RequestOptions inputOptions, bool withBalance = false, bool withCba = false);
