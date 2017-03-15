@@ -42,8 +42,9 @@ namespace KillBill.Client.Net.Infrastructure
         {
             get
             {
+                List<TV> list;
 
-                if (dictionary.TryGetValue(key, out List<TV> list))
+                if (dictionary.TryGetValue(key, out list))
                     return list;
 
                 list = new List<TV>();

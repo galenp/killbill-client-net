@@ -225,7 +225,8 @@ namespace KillBill.Client.Net
             
             var response = client.Execute(request);
 
-            CheckResponse(response, out object defaultObject);
+            object defaultObject;
+            CheckResponse(response, out defaultObject);
 
             return response;
         }

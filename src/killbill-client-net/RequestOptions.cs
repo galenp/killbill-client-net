@@ -67,6 +67,22 @@ namespace KillBill.Client.Net
         }
 
         /**
+        * Helper method for creating an empty RequestOptions object.
+        * @return an empty RequestOptions object.
+        */
+        public static RequestOptions Default()
+        {
+            return new RequestOptionsBuilder()
+                .WithUser(KbConfig.HttpUser)
+                .WithTenantApiKey(KbConfig.ApiKey)
+                .WithTenantApiSecret(KbConfig.ApiSecret)
+                .WithRequestId(Guid.NewGuid().ToString())
+                .WithCreatedBy("Default User")
+                .WithPassword(KbConfig.HttpPassword)
+                .Build();
+        }
+
+        /**
          * Helper method for creating a new builder
          * @return a new instance of RequestOptionsBuilder
          */
