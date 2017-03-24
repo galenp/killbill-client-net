@@ -28,7 +28,27 @@ namespace KillBill.Client.Net.Tests.SafeTests
             var priceList = catalog.PriceLists.First();
             priceList.Name.Should().NotBeNullOrEmpty();
             priceList.Plans.Should().NotBeNullOrEmpty();
+        }
 
+        [Test]
+        public void Get_Base_Plans()
+        {
+            //When
+            var plans = Client.GetBasePlans(Options);
+
+            if (plans == null)
+                Assert.Inconclusive("No base plans found");
+
+            plans.Should().NotBeNullOrEmpty();
+
+            var plan = plans.First();
+            plan.Product.Should().NotBeNullOrEmpty();
+            plan.PriceList.Should().NotBeNullOrEmpty();
+            plan.Plan.Should().NotBeNullOrEmpty();
+
+            plan.FinalPhaseRecurringPrice.Should().NotBeNullOrEmpty();
+            var price = plan.FinalPhaseRecurringPrice.First();
+            price.Currency.Should().NotBeNullOrEmpty();
         }
     }
 }

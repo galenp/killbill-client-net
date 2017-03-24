@@ -118,5 +118,8 @@ namespace KillBill.Client.Net
 
         // CATALOG
         List<Catalog> GetCatalogJson(RequestOptions inputOptions, DateTime? requestedDate = null);
+
+        // PLAN DETAIL
+        List<PlanDetail>  GetBasePlans(RequestOptions inputOptions);
     }
 }

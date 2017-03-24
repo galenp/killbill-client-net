@@ -674,6 +674,12 @@ namespace KillBill.Client.Net
             return client.Get<Subscription>(uri, inputOptions);
         }
 
+        // PLAN DETAIL
+        public List<PlanDetail> GetBasePlans(RequestOptions inputOptions)
+        {
+            var uri = KbConfig.CATALOG_PATH + "/availableBasePlans";
+            return client.Get<List<PlanDetail>>(uri, inputOptions);
+        }
 
         public Subscription CreateSubscription(Subscription subscription, RequestOptions inputOptions, DateTime? requestedDate = null, bool? isMigrated = null)
         {
@@ -752,6 +758,6 @@ namespace KillBill.Client.Net
             }
         }
 
-     
+      
     }
 }

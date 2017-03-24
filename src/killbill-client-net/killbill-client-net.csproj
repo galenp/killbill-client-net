@@ -143,6 +143,7 @@
     <Compile Include="Model\PaymentTransaction.cs" />
     <Compile Include="Model\Phase.cs" />
     <Compile Include="Model\Plan.cs" />
+    <Compile Include="Model\PlanDetail.cs" />
     <Compile Include="Model\PluginProperty.cs" />
     <Compile Include="Model\Price.cs" />
     <Compile Include="Model\PriceList.cs" />
