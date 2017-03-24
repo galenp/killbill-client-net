@@ -115,5 +115,8 @@ namespace KillBill.Client.Net
         //SUBSCRIPTION
         Subscription GetSubscription(Guid subscriptionId, RequestOptions inputOptions);
         Subscription CreateSubscription(Subscription subscription, RequestOptions inputOptions, DateTime? requestedDate = null, bool? isMigrated = null);
+
+        // CATALOG
+        List<Catalog> GetCatalogJson(RequestOptions inputOptions, DateTime? requestedDate = null);
     }
 }

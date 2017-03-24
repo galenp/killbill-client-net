@@ -101,6 +101,7 @@
   <ItemGroup>
     <Compile Include="ModificationTests\AccountModificationTests.cs" />
     <Compile Include="ModificationTests\PaymentModificationTests.cs" />
+    <Compile Include="SafeTests\CatalogTests.cs" />
     <Compile Include="_SetUp\NewEnvironmentTests.cs" />
     <Compile Include="ModificationTests\PaymentMethodModificationTests.cs" />
     <Compile Include="ModificationTests\TenantModificationTests.cs" />

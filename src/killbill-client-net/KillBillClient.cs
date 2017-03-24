@@ -648,6 +648,22 @@ namespace KillBill.Client.Net
             return client.Get<TenantKey>(uri, inputOptions);
         }
 
+        //CATALOG
+        //-------------------------------------------------------------------------------------------------------------------------------------
+        public List<Catalog> GetCatalogJson(RequestOptions inputOptions, DateTime? requestedDate = null)
+        {
+            var uri = KbConfig.CATALOG_PATH;
+            var queryParams = new MultiMap<string>().Create(inputOptions.QueryParams);
+            if (requestedDate.HasValue)
+            {
+                queryParams.Add(KbConfig.QUERY_DELETE_DEFAULT_PM_WITH_AUTO_PAY_OFF, requestedDate.Value.ToDateString());
+            }
+
+            var requestOptions = inputOptions.Extend().WithQueryParams(queryParams).Build();
+            return client.Get<List<Catalog>>(uri, requestOptions);
+
+        }
+
         //SUBSCRIPTION
         //-------------------------------------------------------------------------------------------------------------------------------------
 
@@ -736,6 +752,6 @@ namespace KillBill.Client.Net
             }
         }
 
-        
+     
     }
 }
