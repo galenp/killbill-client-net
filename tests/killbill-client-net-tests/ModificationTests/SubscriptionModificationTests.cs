@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using FluentAssertions;
 using KillBill.Client.Net.Model;
 using NUnit.Framework;
@@ -9,6 +10,42 @@ namespace KillBill.Client.Net.Tests.ModificationTests
     public class SubscriptionModificationTests : BaseTestFixture
     {
         private readonly string externalKey = "aaaaa";
+
+        [Test]
+        public void Create_New_Subscription_WithAddons()
+        {
+            //Given
+            var accountId = new Guid("5e61b191-16cf-4322-bf52-df805fc78ba9");
+            var bundleKey = Guid.NewGuid();
+            var subscriptions = new List<Subscription>()
+            {
+                new Subscription
+                {
+                  AccountId = accountId,
+                  PlanName = "system-connect-monthly",
+                  ProductName = "system-connect",
+                  ProductCategory = "BASE",
+                  BillingPeriod = "MONTHLY",
+                  ExternalKey = $"system-connect-" + bundleKey,
+                },
+
+                new Subscription
+                {
+                    AccountId = accountId,
+                    PlanName = "external-site-monthly",
+                    ProductName = "external-site",
+                    ProductCategory = "ADD_ON",
+                    BillingPeriod = "MONTHLY",
+                    ExternalKey = $"system-connect-" + bundleKey,
+                }
+            };
+
+            //When
+            var bundle = Client.CreateSubscriptionWithAddOns(subscriptions, Options);
+
+            //Then
+            bundle.Should().NotBeNull();
+        }
 
         [Test]
         public void Create_New_Subscription_Bundle()

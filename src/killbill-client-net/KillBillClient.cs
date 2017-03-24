@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -213,6 +214,50 @@ namespace KillBill.Client.Net
             var requestOptions = inputOptions.Extend().WithFollowLocation(followLocation).Build();
 
             return client.Put<Bundle>(uri, bundle, requestOptions);
+        }
+
+        public Bundle CreateSubscriptionWithAddOns(IEnumerable<Subscription> subscriptions, RequestOptions inputOptions,
+           DateTime? requestedDate = null, int? timeoutSec = null)
+        {
+            foreach (var subscription in subscriptions)
+            {
+                if (string.IsNullOrEmpty(subscription.PlanName))
+                {
+                    if (string.IsNullOrEmpty(subscription.ProductName))
+                        throw new ArgumentException("Subscription#productName cannot be null");
+
+                    if (string.IsNullOrEmpty(subscription.ProductCategory))
+                        throw new ArgumentException("Subscription#productCategory cannot be null");
+
+                    if (string.IsNullOrEmpty(subscription.ProductCategory))
+                        throw new ArgumentException("Subscription#billingPeriod cannot be null");
+
+                    if (string.IsNullOrEmpty(subscription.PriceList))
+                        throw new ArgumentException("Subscription#priceList cannot be null");
+
+                    if (subscription.ProductCategory == "BASE" && subscription.AccountId.Equals(Guid.Empty)) {
+                        throw new ArgumentException("Account#accountId cannot be null for base subscription");
+                    }
+                }              
+            }
+
+            var queryParams = new MultiMap<string>().Create(inputOptions.QueryParams);
+            if (timeoutSec.HasValue && timeoutSec.Value > 0)
+            {
+                queryParams.Add(KbConfig.QUERY_CALL_COMPLETION, "true");
+                queryParams.Add(KbConfig.QUERY_CALL_TIMEOUT, timeoutSec.Value.ToString());
+            }
+
+            if (requestedDate.HasValue)
+                queryParams.Add(KbConfig.QUERY_REQUESTED_DT, requestedDate.Value.ToDateString());
+
+            //var httpTimeout = Math.Max(KbConfig.DEFAULT_HTTP_TIMEOUT_SEC, timeoutSec ?? 0);
+            var uri = KbConfig.SUBSCRIPTIONS_PATH + "/createEntitlementWithAddOns";
+            var followLocation = inputOptions.FollowLocation ?? true;
+            var requestOptions =
+                inputOptions.Extend().WithQueryParams(queryParams).WithFollowLocation(followLocation).Build();
+
+            return client.Post<Bundle>(uri, subscriptions, requestOptions);
         }
 
         //BUNDLES
@@ -758,6 +803,6 @@ namespace KillBill.Client.Net
             }
         }
 
-      
+       
     }
 }

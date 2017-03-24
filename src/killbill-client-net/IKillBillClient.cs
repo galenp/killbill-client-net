@@ -42,6 +42,8 @@ namespace KillBill.Client.Net
         Bundle GetBundle(string externalKey, RequestOptions inputOptions);
         Bundle TransferBundle(Bundle bundle, RequestOptions inputOptions);
 
+        Bundle CreateSubscriptionWithAddOns(IEnumerable<Subscription> subscriptions, RequestOptions inputOptions, DateTime? requestedDate = null, int? timeoutSec = null);
+
         //BUNDLES
         Bundles GetAccountBundles(Guid accountId, RequestOptions inputOptions);
         Bundles GetBundles(RequestOptions inputOptions, long offset = 0L, long limit = 100L, AuditLevel auditLevel = AuditLevel.NONE);
