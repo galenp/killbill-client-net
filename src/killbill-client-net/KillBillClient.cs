@@ -726,6 +726,18 @@ namespace KillBill.Client.Net
             return client.Get<List<PlanDetail>>(uri, inputOptions);
         }
 
+        public List<PlanDetail> GetAvailableAddons(string baseProductName, RequestOptions inputOptions)
+        {
+            var uri = KbConfig.CATALOG_PATH + "/availableAddons";
+
+            var queryParams = new MultiMap<string>().Create(inputOptions.QueryParams);
+            queryParams.Add("baseProductName", baseProductName);
+
+            var requestOptions = inputOptions.Extend().WithQueryParams(queryParams).Build();
+
+            return client.Get<List<PlanDetail>>(uri, requestOptions);
+        }
+
         public Subscription CreateSubscription(Subscription subscription, RequestOptions inputOptions, DateTime? requestedDate = null, bool? isMigrated = null)
         {
             //var httpTimeout = KbConfig.DEFAULT_HTTP_TIMEOUT_SEC;
@@ -803,6 +815,6 @@ namespace KillBill.Client.Net
             }
         }
 
-       
+      
     }
 }

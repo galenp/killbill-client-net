@@ -50,5 +50,19 @@ namespace KillBill.Client.Net.Tests.SafeTests
             var price = plan.FinalPhaseRecurringPrice.First();
             price.Currency.Should().NotBeNullOrEmpty();
         }
+
+        [Test]
+        public void Get_Available_Addons()
+        {
+            //When
+            var addons = Client.GetAvailableAddons("system-connect", Options);
+
+            //Then
+
+            if (addons == null)
+                Assert.Inconclusive("No addons found");
+
+            addons.Should().NotBeNullOrEmpty();
+        }
     }
 }

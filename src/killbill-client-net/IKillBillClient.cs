@@ -123,5 +123,6 @@ namespace KillBill.Client.Net
 
         // PLAN DETAIL
         List<PlanDetail>  GetBasePlans(RequestOptions inputOptions);
+        List<PlanDetail> GetAvailableAddons(string baseProductName, RequestOptions inputOptions);
     }
 }
