@@ -35,6 +35,16 @@ namespace KillBill.Client.Net.Tests.SafeTests
         }
 
         [Test]
+        [TestCase("lister-bundle-a053363e-933e-4d16-91ab-a65c41111bf8")]
+        public void Get_Bundle(string bundleKey)
+        {
+            var bundle = Client.GetBundle(bundleKey, Options);
+
+            //Then
+            bundle.Should().NotBeNull();
+        }
+
+        [Test]
         public void Get_Bundles()
         {
             //When

@@ -194,7 +194,9 @@ namespace KillBill.Client.Net
 
             var requestOptions = inputOptions.Extend().WithQueryParams(queryParams).Build();
 
-            return client.Get<Bundle>(uri, requestOptions);
+            var bundles = client.Get<Bundles>(uri, requestOptions);
+
+            return bundles.Any() ? bundles.First() : null;
         }
 
         public Bundle TransferBundle(Bundle bundle, RequestOptions inputOptions)
