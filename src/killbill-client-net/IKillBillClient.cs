@@ -118,6 +118,8 @@ namespace KillBill.Client.Net
         Subscription GetSubscription(Guid subscriptionId, RequestOptions inputOptions);
         Subscription CreateSubscription(Subscription subscription, RequestOptions inputOptions, DateTime? requestedDate = null, bool? isMigrated = null);
 
+        Subscription UpdateSubscription(Subscription subscription, RequestOptions inputOptions, BillingActionPolicy? billingPolicy = null, DateTime? requestedDate = null, bool? isMigrated = null);
+
         // CATALOG
         List<Catalog> GetCatalogJson(RequestOptions inputOptions, DateTime? requestedDate = null);
 

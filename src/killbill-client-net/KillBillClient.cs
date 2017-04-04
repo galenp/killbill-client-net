@@ -798,9 +798,52 @@ namespace KillBill.Client.Net
 
         // subscription:update
 
+        public Subscription UpdateSubscription(Subscription subscription, RequestOptions inputOptions, BillingActionPolicy? billingPolicy = null, DateTime? requestedDate = null, bool? isMigrated = null)
+        {
+            if (subscription.SubscriptionId.Equals(Guid.Empty))
+                throw new ArgumentException("Subscription#subscriptionId cannot be empty");
+
+            if (subscription.PlanName == null)
+            {
+                if (string.IsNullOrEmpty(subscription.ProductName))
+                    throw new ArgumentException("Subscription#productName cannot be null");
+
+                if (string.IsNullOrEmpty(subscription.ProductCategory))
+                    throw new ArgumentException("Subscription#productCategory cannot be null");
+
+                if (string.IsNullOrEmpty(subscription.BillingPeriod))
+                    throw new ArgumentException("Subscription#billingPeriod cannot be null");
+
+                if (string.IsNullOrEmpty(subscription.PriceList))
+                    throw new ArgumentException("Subscription#priceList cannot be null");
+            }
+
+            var uri = KbConfig.SUBSCRIPTIONS_PATH + "/" + subscription.SubscriptionId;
+            var queryParams = new MultiMap<string>().Create(inputOptions.QueryParams);
+           
+            //if (timeoutSec.HasValue)
+            //{
+            //    queryParams.Add(KbConfig.QUERY_CALL_COMPLETION, timeoutSec.Value > 0 ? "true" : "false");
+            //    queryParams.Add(KbConfig.QUERY_CALL_TIMEOUT, timeoutSec.Value.ToString());
+            //    timeoutSec = timeoutSec.Value;
+            //}
+
+            if (requestedDate.HasValue)
+            {
+                queryParams.Add(KbConfig.QUERY_REQUESTED_DT, requestedDate.Value.ToShortDateString());
+            }
+
+            if (billingPolicy.HasValue)
+            {
+                queryParams.Add(KbConfig.QUERY_BILLING_POLICY, billingPolicy.ToString());
+            }
+            var requestOptions = inputOptions.Extend().WithQueryParams(queryParams).Build();
+            return client.Put<Subscription>(uri, subscription, requestOptions);
+        }
+
 
         // subscription:cancel
-      
+
 
         private void StorePluginPropertiesAsParams(Dictionary<string, string> pluginProperties,
             ref MultiMap<string> queryParams)
@@ -817,6 +860,5 @@ namespace KillBill.Client.Net
             }
         }
 
-      
     }
 }
