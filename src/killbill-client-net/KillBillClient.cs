@@ -196,7 +196,7 @@ namespace KillBill.Client.Net
 
             var bundles = client.Get<Bundles>(uri, requestOptions);
 
-            return bundles.Any() ? bundles.First() : null;
+            return bundles?.First();
         }
 
         public Bundle TransferBundle(Bundle bundle, RequestOptions inputOptions)
