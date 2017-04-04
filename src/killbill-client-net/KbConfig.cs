@@ -84,6 +84,7 @@ namespace KillBill.Client.Net
         public const string QUERY_ACCOUNT_TREAT_NULL_AS_RESET = "treatNullAsReset";
         public const string QUERY_AUDIT = "audit";
         public const string QUERY_BILLING_POLICY = "billingPolicy";
+        public const string QUERY_USE_REQUESTED_DATE_FOR_BILLING = "useRequestedDateForBilling";
         public const string QUERY_CALL_COMPLETION = "callCompletion";
         public const string QUERY_CALL_TIMEOUT = "callTimeoutSec";
         public const string QUERY_CUSTOM_FIELDS = "customFieldList";

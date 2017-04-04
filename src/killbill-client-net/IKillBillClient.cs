@@ -120,6 +120,10 @@ namespace KillBill.Client.Net
 
         Subscription UpdateSubscription(Subscription subscription, RequestOptions inputOptions, BillingActionPolicy? billingPolicy = null, DateTime? requestedDate = null, bool? isMigrated = null);
 
+        void CancelSubscription(Guid subscriptionId, RequestOptions inputOptions, DateTime? requestedDate = null,
+            bool? useRequestedDateForBilling = null, EntitlementActionPolicy? entitlementPolicy = null,
+            BillingActionPolicy? billingPolicy = null);
+
         // CATALOG
         List<Catalog> GetCatalogJson(RequestOptions inputOptions, DateTime? requestedDate = null);
 

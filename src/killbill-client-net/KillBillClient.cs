@@ -843,7 +843,37 @@ namespace KillBill.Client.Net
 
 
         // subscription:cancel
+        public void CancelSubscription(Guid subscriptionId, RequestOptions inputOptions, DateTime? requestedDate = null,
+            bool? useRequestedDateForBilling = null, EntitlementActionPolicy? entitlementPolicy = null,
+            BillingActionPolicy? billingPolicy = null)
+        {
+            var uri = KbConfig.SUBSCRIPTIONS_PATH + "/" + subscriptionId;
+            var queryParams = new MultiMap<string>().Create(inputOptions.QueryParams);
+            //if (timeoutSec.HasValue)
+            //{
+            //    queryParams.Add(KbConfig.QUERY_CALL_COMPLETION, timeoutSec.Value > 0 ? "true" : "false");
+            //    queryParams.Add(KbConfig.QUERY_CALL_TIMEOUT, timeoutSec.Value.ToString());
+            //    timeoutSec = timeoutSec.Value;
+            //}
+            if (requestedDate.HasValue) {
+                queryParams.Add(KbConfig.QUERY_REQUESTED_DT, requestedDate.Value.ToShortDateString());
+            }
 
+            if (entitlementPolicy.HasValue) {
+                queryParams.Add(KbConfig.QUERY_ENTITLEMENT_POLICY, entitlementPolicy.ToString());
+            }
+
+            if (billingPolicy.HasValue) {
+                queryParams.Add(KbConfig.QUERY_BILLING_POLICY, billingPolicy.ToString());
+            }
+
+            if (useRequestedDateForBilling.HasValue) {
+                queryParams.Add(KbConfig.QUERY_USE_REQUESTED_DATE_FOR_BILLING, useRequestedDateForBilling.Value ? "true" : "false");
+            }
+
+            var requestOptions = inputOptions.Extend().WithQueryParams(queryParams).Build();
+            client.Delete(uri, requestOptions);
+        }
 
         private void StorePluginPropertiesAsParams(Dictionary<string, string> pluginProperties,
             ref MultiMap<string> queryParams)
@@ -860,5 +890,6 @@ namespace KillBill.Client.Net
             }
         }
 
+        
     }
 }
