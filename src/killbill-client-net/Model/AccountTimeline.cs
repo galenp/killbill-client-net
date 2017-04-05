@@ -7,6 +7,6 @@ namespace KillBill.Client.Net.Model
         public Account Account { get; set; }
         public List<Bundle> Bundles { get; set; }
         public List<Invoice> Invoices { get; set; }
-        //private List<InvoicePayment> Payments {get;set;}
+        public List<InvoicePayment> Payments {get;set;}
     }
 }
